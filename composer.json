@@ -1,0 +1,9 @@
+{
+    "config": {
+        "vendor-dir" : "third-parties"
+    },
+    "require": {
+        "php": "^7.0.8",
+        "yahnis-elsts/plugin-update-checker": "^4.7"
+    }
+}
