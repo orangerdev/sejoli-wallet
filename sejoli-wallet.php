@@ -102,13 +102,6 @@ function run_sejoli_wallet() {
 
 }
 
-function run_sejoli_reward() {
-
-	$plugin = new Sejoli_Reward();
-	$plugin->run();
-
-}
-
 require_once(SEJOLI_WALLET_DIR . 'third-parties/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');
 
 $update_checker = Puc_v4_Factory::buildUpdateChecker(
@@ -119,7 +112,7 @@ $update_checker = Puc_v4_Factory::buildUpdateChecker(
 
 $update_checker->setBranch('master');
 
-add_action('sejoli/init', 	'run_sejoli_reward');
+add_action('sejoli/init', 	'run_sejoli_wallet');
 
 register_activation_hook( __FILE__, 'activate_sejoli_wallet' );
 register_deactivation_hook( __FILE__, 'deactivate_sejoli_wallet' );
