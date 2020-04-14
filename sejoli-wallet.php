@@ -37,9 +37,9 @@ global $sejoli_wallet;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SEJOLI_WALLET_VERSION'	,'1.0.0' );
-define( 'SEJOLI_WALLET_DIR' 	,plugin_dir_path( __FILE__ ) );
-define( 'SEJOLI_WALLET_URL' 	,plugin_dir_url( __FILE__ ) );
+define( 'SEJOLI_WALLET_VERSION'	, '1.0.0' );
+define( 'SEJOLI_WALLET_DIR' 	, plugin_dir_path( __FILE__ ) );
+define( 'SEJOLI_WALLET_URL' 	, plugin_dir_url( __FILE__ ) );
 
 require SEJOLI_WALLET_DIR . '/third-parties/autoload.php';
 
@@ -49,11 +49,11 @@ function sejoli_wallet_check_sejoli() {
 
 	if(!defined('SEJOLISA_VERSION')) :
 
-		add_action('admin_notices', 'sejolp_no_sejoli_functions');
+		add_action('admin_notices', 'sejoli_wallet_no_sejoli_functions');
 
-		function sejolp_no_sejoli_functions() {
+		function sejoli_wallet_no_sejoli_functions() {
 			?><div class='notice notice-error'>
-			<p><?php _e('Anda belum menginstall atau mengaktifkan SEJOLI terlebih dahulu.', 'sejoli-reward'); ?></p>
+			<p><?php _e('Anda belum menginstall atau mengaktifkan SEJOLI terlebih dahulu.', 'sejoli'); ?></p>
 			</div><?php
 		}
 
@@ -112,7 +112,7 @@ $update_checker = Puc_v4_Factory::buildUpdateChecker(
 
 $update_checker->setBranch('master');
 
-add_action('sejoli/init', 	'run_sejoli_wallet');
+run_sejoli_wallet();
 
 register_activation_hook( __FILE__, 'activate_sejoli_wallet' );
 register_deactivation_hook( __FILE__, 'deactivate_sejoli_wallet' );

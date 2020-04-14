@@ -114,13 +114,14 @@ class Sejoli_Wallet {
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-sejoli-wallet-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/product.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-sejoli-wallet-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public.php';
 
 		$this->loader = new Sejoli_Wallet_Loader();
 
@@ -152,11 +153,13 @@ class Sejoli_Wallet {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Sejoli_Wallet_Admin( $this->get_plugin_name(), $this->get_version() );
+		$admin 	 = new Sejoli_Wallet\Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$product = new Sejoli_Wallet\Admin\Product( $this->get_plugin_name(), $this->get_version() );
 
+		$this->loader->add_filter( 'sejoli/product/fields',					$product, 'set_product_fields', 	11);
+		$this->loader->add_filter( 'sejoli/user-group/fields',				$product, 'set_user_group_fields',	11);
+		$this->loader->add_filter( 'sejoli/user-group/per-product/fields',	$product, 'set_user_group_fields', 11);
 	}
 
 	/**
@@ -168,10 +171,7 @@ class Sejoli_Wallet {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Sejoli_Wallet_Public( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$front = new Sejoli_Wallet\Front( $this->get_plugin_name(), $this->get_version() );
 
 	}
 
