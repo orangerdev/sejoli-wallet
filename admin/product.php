@@ -108,7 +108,6 @@ class Product {
 	/**
 	 * Add cashback setting in each product setup in user group fields
 	 * Hooked via filter sejoli/user-group/fields, priority 11
-	 * Hooked via filter sejoli/user-group/per-product/fields, priority 11
 	 * @since 	1.0.0
 	 * @param 	array $fields
 	 * @return 	array
@@ -172,8 +171,90 @@ class Product {
 				))
 		);
 
+		array_splice($fields, 2, 0, $extra_fields);
+
+		return $fields;
+	}
+
+	/**
+	 * Add cashback setting in each product setup in user group fields
+	 * Hooked via filter sejoli/user-group/per-product/fields, priority 11
+	 * @since 	1.0.0
+	 * @param 	array $fields
+	 * @return 	array
+	 */
+	public function set_user_group_per_product_fields($fields) {
+
+		$extra_fields = array(
+			Field::make('separator', 'sep_cashback', __('Pengaturan Cashback', 'sejoli'))
+				->set_classes('sejoli-with-help'),
+
+			Field::make('checkbox',	'cashback_activate', __('Aktifkan cashback', 'sejoli')),
+
+			Field::make('text', 'cashback_value',   __('Nilai cashback', 'sejoli'))
+				->set_attribute('type', 'number')
+				->set_attribute('min', 0)
+				->set_default_value(0)
+				->set_width(50)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'cashback_activate',
+						'value'	=> true
+					)
+				)),
+
+			Field::make('select', 'cashback_type', __('Tipe cashback', 'sejoli'))
+				->set_options(array(
+					'fixed'      => __('Tetap', 'sejoli'),
+					'percentage' => __('Persentase', 'sejoli')
+				))
+				->set_width(50)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'cashback_activate',
+						'value'	=> true
+					)
+				)),
+
+			Field::make('text', 'cashback_max', __('Maksimal cashback (Rp). '))
+				->set_attribute('type', 'number')
+				->set_attribute('min', 0)
+				->set_default_value(0)
+				->set_help_text(
+					__('Kosongkan jika tidak ada maksimum cashback.', 'sejoli')
+				)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'cashback_activate',
+						'value'	=> true
+					)
+				)),
+
+			Field::make('checkbox', 'cashback_refundable', __('Cashback bisa dicairkan?', 'sejoli'))
+				->set_help_text(
+					__('Cashback bisa dibelanjakan kembali, namun jika cashback bisa dicair maka silahkan aktifkan fitur ini', 'sejoli')
+				)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'cashback_activate',
+						'value'	=> true
+					)
+				))
+		);
+
 		array_splice($fields, 1, 0, $extra_fields);
 
 		return $fields;
+	}
+
+	/**
+	 * Set cashback data into product meta
+	 * Hooked via filter sejoli/product/meta-data, priority 122
+	 * @since 	1.0.0
+	 * @param 	WP_Post $product
+	 * @return 	WP_Post
+	 */
+	public function set_product_cashback(\WP_Post $product) {
+
 	}
 }
