@@ -74,6 +74,8 @@ class Product {
                 Field::make('separator', 'sep_cashback', __('Pengaturan Cashback', 'sejoli'))
                     ->set_classes('sejoli-with-help'),
 
+				Field::make('checkbox',	'cashback_activate', __('Aktifkan cashback', 'sejoli')),
+
                 Field::make('text', 'cashback_value',   __('Nilai cashback', 'sejoli'))
                     ->set_attribute('type', 'number')
                     ->set_attribute('min', 0)
@@ -256,5 +258,52 @@ class Product {
 	 */
 	public function set_product_cashback(\WP_Post $product) {
 
+		$activate   = carbon_get_post_meta($product->ID, 'cashback_activate');
+		$value      = carbon_get_post_meta($product->ID, 'cashback_value');
+		$type       = carbon_get_post_meta($product->ID, 'cashback_type');
+		$max        = carbon_get_post_meta($product->ID, 'cashback_max');
+		$refundable = carbon_get_post_meta($product->ID, 'cashback_refundable');
+
+		// Modify reward point by user group
+		if(is_user_logged_in()) :
+
+			$group = sejolisa_get_user_group();
+
+			if(false !== $group['cashback_activate']) :
+
+				$activate   = $group['cashback_activate'];
+				$value      = $group['cashback_value'];
+				$type       = $group['cashback_type'];
+				$max        = $group['cashback_max'];
+				$refundable = $group['cashback_refundable'];
+
+				if(
+					array_key_exists('per_product', $group) &&
+					array_key_exists($product->ID, $group['per_product']) &&
+					false !== $group['per_product'][$product->ID]['cashback_activate']
+				) :
+
+					$per_product = $group['per_product'][$product->ID];
+					$activate    = $per_product['cashback_activate'];
+					$value       = $per_product['cashback_value'];
+					$type        = $per_product['cashback_type'];
+					$max         = $per_product['cashback_max'];
+					$refundable  = $per_product['cashback_refundable'];
+
+				endif;
+
+			endif;
+
+		endif;
+
+		$product->cashback = array(
+			'activate'   => boolval($activate),
+			'value'      => floatval($value),
+			'type'       => $type,
+			'max'        => floatval($max),
+			'refundable' => boolval($refundable),
+		);
+
+		return $product;
 	}
 }
