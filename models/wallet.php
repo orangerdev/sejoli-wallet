@@ -10,7 +10,6 @@ Class Wallet extends \SejoliSA\Model
     static protected $type         = 'out';
     static protected $refundable   = false;
     static protected $label        = NULL;
-    static protected $order_status = NULL;
     static protected $valid_point  = true;
     static protected $table        = 'sejolisa_wallet';
 
@@ -25,7 +24,6 @@ Class Wallet extends \SejoliSA\Model
         self::$refundable   = false;
         self::$valid_point  = true;
         self::$label        = NULL;
-        self::$order_status = NULL;
 
         parent::reset();
 
@@ -81,19 +79,6 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Set order status
-     * @since   1.0.0
-     * @param   string $status
-     */
-    static public function set_order_status($status) {
-
-        $available_status   = apply_filters('sejoli/order/status', []);
-        self::$order_status = !array_key_exists($status, $available_status) ? 'on-hold' : $status;
-
-        return new static;
-    }
-
-    /**
      * Set if point is valid or not
      * @since   1.0.0
      * @param   boolean $valid_point
@@ -115,12 +100,17 @@ Class Wallet extends \SejoliSA\Model
 
             if(empty(self::$value)) :
                 self::set_valid(false);
-                self::set_message( __('Poin tidak boleh kosong', 'sejoli-wallet'));
+                self::set_message( __('Value tidak boleh kosong', 'sejoli'));
             endif;
 
             if(empty(self::$type)) :
                 self::set_valid(false);
-                self::set_message( __('Tipe poin tidak valid', 'sejoli-wallet'));
+                self::set_message( __('Tipe poin tidak valid', 'sejoli'));
+            endif;
+
+            if(empty(self::$label)) :
+                self::set_valid(false);
+                self::set_message( __('Label point tidak boleh kosong', 'sejoli'));
             endif;
 
         endif;
@@ -129,7 +119,7 @@ Class Wallet extends \SejoliSA\Model
 
             if(!is_a(self::$user, 'WP_User')) :
                 self::set_valid(false);
-                self::set_message( __('User tidak valid', 'sejoli-wallet'));
+                self::set_message( __('User tidak valid', 'sejoli'));
             endif;
 
         endif;
@@ -138,22 +128,16 @@ Class Wallet extends \SejoliSA\Model
 
             if(empty(self::$order_id)) :
                 self::set_valid(false);
-                self::set_message( __('Order ID tidak boleh kosong', 'sejoli-wallet'));
+                self::set_message( __('Order ID tidak boleh kosong', 'sejoli'));
             endif;
 
         endif;
 
         if(in_array(self::$action, array('add'))) :
 
-            if(empty(self::$order_status)) :
-                self::set_valid(false);
-                self::set_message( __('Order status tidak valid', 'sejoli-wallet'));
-            endif;
-
-
             if(!is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
                 self::set_valid(false);
-                self::set_message( __('Produk tidak valid', 'sejoli-wallet'));
+                self::set_message( __('Produk tidak valid', 'sejoli'));
             endif;
 
         endif;
@@ -161,11 +145,11 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Check existing point by order_id and user_id
+     * Check existing cashback by order_id and user_id
      * @since   1.0.0
      * @return  boolean
      */
-    static protected function check_existing_point() {
+    static protected function check_existing_cashback() {
 
         parent::$table = self::$table;
 
@@ -174,7 +158,6 @@ Class Wallet extends \SejoliSA\Model
                         'order_id'    => self::$order_id,
                         'user_id'     => self::$user->ID,
                         'type'        => self::$type,
-                        'valid_point' => true,
                     ))
                     ->first();
 
@@ -182,26 +165,25 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Add point with IN type
+     * Add cashback
      * @since   1.0.0
      */
-    static public function add_point() {
+    static public function add_cashback() {
 
         self::set_action('add');
         self::validate();
 
         if(false !== self::$valid) :
 
-            self::$type = 'in';
+            self::$type  = 'in';
 
-            if(false === self::check_existing_point()) :
+            if(false === self::check_existing_cashback()) :
 
                 parent::$table = self::$table;
 
-                $point = [
+                $wallet = [
                     'created_at'   => current_time('mysql'),
                     'order_id'     => self::$order_id,
-                    'order_status' => self::$order_status,
                     'product_id'   => self::$product->ID,
                     'user_id'      => self::$user->ID,
                     'value'        => self::$value,
@@ -212,18 +194,18 @@ Class Wallet extends \SejoliSA\Model
                     'meta_data'    => serialize(self::$meta_data),
                 ];
 
-                $point['ID'] = Capsule::table(self::table())
-                                ->insertGetId($point);
+                $wallet['ID'] = Capsule::table(self::table())
+                                ->insertGetId($wallet);
 
-                self::set_valid(true);
-                self::set_respond('point', $point);
+                self::set_valid     (true);
+                self::set_respond   ('wallet', $wallet);
 
             else :
 
                 self::set_valid(false);
                 self::set_message(
                     sprintf(
-                        __('Add wallet value for order %s and user %s already exists', 'sejoli'),
+                        __('Add cashback value for order %s and user %s already exists', 'sejoli'),
                         self::$order_id,
                         self::$user->ID
                     )
@@ -253,16 +235,15 @@ Class Wallet extends \SejoliSA\Model
                             ->where(array(
                                 'order_id'    => self::$order_id,
                                 'user_id'     => self::$user->ID,
-                                'type'        => 'in',
                                 'valid_point' => true
                             ));
 
-            $point = $query->first();
+            $wallet = $query->first();
 
-            if($point) :
+            if($wallet) :
 
                 self::set_valid(true);
-                self::set_respond('point', $point);
+                self::set_respond('wallet', $wallet);
 
             else :
 
@@ -273,10 +254,10 @@ Class Wallet extends \SejoliSA\Model
                                 ))
                             ->first();
 
-                if($point) :
+                if($wallet) :
 
                     self::set_valid(true);
-                    self::set_respond('point', $point);
+                    self::set_respond('wallet', $wallet);
 
                 else :
 
@@ -414,7 +395,7 @@ Class Wallet extends \SejoliSA\Model
         else :
 
             self::set_valid(false);
-            self::set_message( __('No point data', 'sejoli-wallet'));
+            self::set_message( __('No point data', 'sejoli'));
 
         endif;
 
@@ -456,7 +437,7 @@ Class Wallet extends \SejoliSA\Model
         else :
 
             self::set_valid(false);
-            self::set_message( sprintf( __('No point for user %s', 'sejoli-wallet'), self::$user_id));
+            self::set_message( sprintf( __('No point for user %s', 'sejoli'), self::$user_id));
 
         endif;
 

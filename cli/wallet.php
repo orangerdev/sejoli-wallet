@@ -25,31 +25,39 @@ class Wallet extends \SejoliSA\CLI {
             $order  = $response['orders'];
 
             if(
-                property_exists($order['product'], 'reward_point') &&
-                0 < $order['product']->reward_point
+                property_exists($order['product'], 'cashback') &&
+                $order['product']->cashback['activate']
             ) :
 
-                $point_response = sejoli_reward_add_point(array(
-                    'order_id'     => $order['ID'],
-                    'product_id'   => $order['product']->ID,
-                    'order_status' => $order['status'],
-                    'user_id'      => $order['user_id'],
-                    'point'        => $order['product']->reward_point
+                $cashback = sejoli_calculate_cashback($order, $order['user_id']);
+
+                $cashback_response = sejoli_add_cashback(array(
+                    'order_id'    => $order['ID'],
+                    'product_id'  => $order['product']->ID,
+                    'user_id'     => $order['user_id'],
+                    'value'       => $cashback['total'],
+                    'refundable'  => $cashback['refundable'],
+                    'label'       => 'cashback',
+                    'valid_point' => ('completed' !== $order['status']) ? false : true,
+                    'meta_data'   => array(
+                        'setup' => $cashback['setup'],
+                        'group' => $cashback['group']
+                    )
                 ));
 
-                if(false !== $point_response['valid']) :
+                if(false !== $cashback_response['valid']) :
 
                     $this->message(
                         sprintf(
-                            __('%s Point from order %s and user %s already added', 'ttom'),
-                            $point_response['point']['point'],
-                            $point_response['point']['order_id'],
-                            $point_response['point']['user_id']
+                            __('Cashback %s from order %s and user %s already added', 'ttom'),
+                            $cashback_response['wallet']['value'],
+                            $cashback_response['wallet']['order_id'],
+                            $cashback_response['wallet']['user_id']
                         ), 'success');
 
                 else :
 
-                    $this->message($point_response['messages']['error'], 'error');
+                    $this->message($cashback_response['messages']['error'], 'error');
 
                 endif;
 

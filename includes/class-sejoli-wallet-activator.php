@@ -42,7 +42,6 @@ class Sejoli_Wallet_Activator {
                 $table->increments  ('ID');
                 $table->datetime    ('created_at');
                 $table->integer     ('order_id');
-				$table->string      ('order_status');
                 $table->integer     ('product_id');
                 $table->integer     ('user_id');
                 $table->integer     ('value');

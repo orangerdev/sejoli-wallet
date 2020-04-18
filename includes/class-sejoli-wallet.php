@@ -113,6 +113,11 @@ class Sejoli_Wallet {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-sejoli-wallet-i18n.php';
 
 		/**
+		 * The class responsible for datatabase model
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'models/wallet.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
@@ -129,6 +134,11 @@ class Sejoli_Wallet {
 		 * The class responsible for defining CLI command
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'cli/wallet.php';
+
+		/**
+		 * Routine functions
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'functions/wallet.php';
 
 		$this->loader = new Sejoli_Wallet_Loader();
 
