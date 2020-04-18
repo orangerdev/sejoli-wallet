@@ -67,6 +67,39 @@ class Wallet extends \SejoliSA\CLI {
     }
 
     /**
+     * Update wallet valid point
+     *
+     * <order_id>
+     * : The order id
+     *
+     * <valid>
+     * : Validity status
+     *
+     *  wp sejolisa wallet update_valid_point 2227 1
+     *
+     * @when after_wp_load
+     */
+    public function update_valid_point(array $args) {
+
+        list($order_id, $valid) = $args;
+
+        $response = sejolisa_get_order(array('ID' => $order_id));
+
+        if(false !== $response['valid']) :
+
+            $order  = $response['orders'];
+
+            $cashback_response = sejoli_update_wallet_valid_point(array(
+                'order_id'    => $order['ID'],
+                'valid_point' => boolval($valid)
+            ));
+
+            __debug($cashback_response);
+
+        endif;
+    }
+
+    /**
      * Get user wallet
      *
      * <user_id>
