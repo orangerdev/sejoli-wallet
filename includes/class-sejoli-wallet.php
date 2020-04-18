@@ -76,6 +76,7 @@ class Sejoli_Wallet {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->register_cli();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
@@ -116,12 +117,18 @@ class Sejoli_Wallet {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/product.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/user.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public.php';
+
+		/**
+		 * The class responsible for defining CLI command
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'cli/wallet.php';
 
 		$this->loader = new Sejoli_Wallet_Loader();
 
@@ -145,6 +152,22 @@ class Sejoli_Wallet {
 	}
 
 	/**
+	 * Register CLI command
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	private function register_cli() {
+
+		if ( !class_exists( 'WP_CLI' ) ) :
+			return;
+		endif;
+
+		$wallet 	= new Sejoli_Wallet\CLI\Wallet();
+
+		WP_CLI::add_command('sejolisa wallet', $wallet);
+	}
+
+	/**
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 *
@@ -161,6 +184,10 @@ class Sejoli_Wallet {
 		$this->loader->add_filter( 'sejoli/user-group/fields',				$product, 'set_user_group_fields',	11);
 		$this->loader->add_filter( 'sejoli/user-group/per-product/fields',	$product, 'set_user_group_per_product_fields',  11);
 		$this->loader->add_filter( 'sejoli/product/meta-data',				$product, 'set_product_cashback',	122);
+
+		$user = new Sejoli_Wallet\Admin\User( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_filter( 'sejoli/user-group/detail',				$user, 'set_user_group_detail', 11, 4);
 	}
 
 	/**

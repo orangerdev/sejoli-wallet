@@ -99,7 +99,7 @@ class Product {
 
                 Field::make('checkbox', 'cashback_refundable', __('Cashback bisa dicairkan?', 'sejoli'))
                     ->set_help_text(
-                        __('Cashback bisa dibelanjakan kembali, namun jika cashback bisa dicair maka silahkan aktifkan fitur ini', 'sejoli')
+                        __('Cashback <strong>secara default</strong> bisa dibelanjakan kembali, namun jika cashback bisa dicairkan maka silahkan aktifkan fitur ini', 'sejoli')
                     )
             )
         );
@@ -163,7 +163,7 @@ class Product {
 
 			Field::make('checkbox', 'cashback_refundable', __('Cashback bisa dicairkan?', 'sejoli'))
 				->set_help_text(
-					__('Cashback bisa dibelanjakan kembali, namun jika cashback bisa dicair maka silahkan aktifkan fitur ini', 'sejoli')
+					__('Cashback <strong>secara default</strong> bisa dibelanjakan kembali, namun jika cashback bisa dicairkan maka silahkan aktifkan fitur ini', 'sejoli')
 				)
 				->set_conditional_logic(array(
 					array(
@@ -234,7 +234,7 @@ class Product {
 
 			Field::make('checkbox', 'cashback_refundable', __('Cashback bisa dicairkan?', 'sejoli'))
 				->set_help_text(
-					__('Cashback bisa dibelanjakan kembali, namun jika cashback bisa dicair maka silahkan aktifkan fitur ini', 'sejoli')
+					__('Cashback <strong>secara default</strong> bisa dibelanjakan kembali, namun jika cashback bisa dicairkan maka silahkan aktifkan fitur ini', 'sejoli')
 				)
 				->set_conditional_logic(array(
 					array(
@@ -258,6 +258,7 @@ class Product {
 	 */
 	public function set_product_cashback(\WP_Post $product) {
 
+		$setup 	    = 'general';
 		$activate   = carbon_get_post_meta($product->ID, 'cashback_activate');
 		$value      = carbon_get_post_meta($product->ID, 'cashback_value');
 		$type       = carbon_get_post_meta($product->ID, 'cashback_type');
@@ -276,6 +277,7 @@ class Product {
 				$type       = $group['cashback_type'];
 				$max        = $group['cashback_max'];
 				$refundable = $group['cashback_refundable'];
+				$setup 		= 'user-group';
 
 				if(
 					array_key_exists('per_product', $group) &&
@@ -284,11 +286,13 @@ class Product {
 				) :
 
 					$per_product = $group['per_product'][$product->ID];
+
 					$activate    = $per_product['cashback_activate'];
 					$value       = $per_product['cashback_value'];
 					$type        = $per_product['cashback_type'];
 					$max         = $per_product['cashback_max'];
 					$refundable  = $per_product['cashback_refundable'];
+					$setup 		 = 'group-per-product';
 
 				endif;
 
@@ -302,6 +306,7 @@ class Product {
 			'type'       => $type,
 			'max'        => floatval($max),
 			'refundable' => boolval($refundable),
+			'setup'		 => $setup
 		);
 
 		return $product;
