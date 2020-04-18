@@ -113,19 +113,21 @@ class Wallet extends \SejoliSA\CLI {
 
         list($user_id)  = $args;
 
-        $response = sejoli_reward_get_user_point($user_id);
+        $response = sejoli_get_user_wallet_data($user_id);
 
         if(false !== $response['valid']) :
             $this->render(
                 array(
-                    (array) $response['point']
+                    (array) $response['wallet']
                 ),
                 'table',
                 array(
                     'user_id',
-                    'added_point',
-                    'reduce_point',
-                    'available_point',
+                    'cash_value',
+                    'point_value',
+                    'used_value',
+                    'available_cash',
+                    'available_total'
                 )
             );
         else :

@@ -65,6 +65,29 @@ function sejoli_update_wallet_valid_point($args) {
 }
 
 /**
+ * Get user wallet data
+ * @since   1.0.0
+ * @param   integer $user_id
+ * @return  array   Response
+ */
+function sejoli_get_user_wallet_data($user_id = 0) {
+
+    $user_id = (0 === $user_id) ? get_current_user_id() : $user_id;
+
+    $response = \SEJOLI_WALLET\Model\Wallet::reset()
+                    ->set_user_id($user_id)
+                    ->get_user_wallet()
+                    ->respond();
+
+    return wp_parse_args($response, array(
+        'valid'    => false,
+        'wallet'   => NULL,
+        'messages' => array()    
+    ));
+
+}
+
+/**
  * Calculate cashback by an order
  * @since   1.0.0
  * @param   array   $order

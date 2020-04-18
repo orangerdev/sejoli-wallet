@@ -403,10 +403,10 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Get available user point
+     * Get user wallet data
      * @since   1.0.0
      */
-    static public function get_available_point_for_single_user() {
+    static public function get_user_wallet() {
 
         global $wpdb;
 
@@ -416,13 +416,25 @@ Class Wallet extends \SejoliSA\Model
                     ->select(
                         'user_id',
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE 0 END) AS added_point'
+                            'SUM(CASE WHEN type = "in" AND refundable = 1 THEN value ELSE 0 END) AS cash_value'
                         ),
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "out" THEN point ELSE 0 END) AS reduce_point'
+                            'SUM(CASE WHEN type = "in" AND refundable = 0 THEN value ELSE 0 END) AS point_value' // Non refundable
                         ),
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE -point END) AS available_point'
+                            'SUM(CASE WHEN type = "out" THEN value ELSE 0 END) AS used_value'
+                        ),
+                        Capsule::raw(
+                            'SUM(
+                                CASE
+                                    WHEN type = "in" AND refundable = 1 THEN value
+                                    WHEN type = "in" AND refundable = 0 THEN 0
+                                    ELSE -value
+                                END
+                             ) AS available_cash'
+                        ),
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "in" THEN value ELSE -value END) AS available_total'
                         )
                     )
                     ->where('valid_point', true)
@@ -432,12 +444,12 @@ Class Wallet extends \SejoliSA\Model
         if($query) :
 
             self::set_valid(true);
-            self::set_respond('point', $query);
+            self::set_respond('wallet', $query);
 
         else :
 
             self::set_valid(false);
-            self::set_message( sprintf( __('No point for user %s', 'sejoli'), self::$user_id));
+            self::set_message( sprintf( __('No wallet data for user %s', 'sejoli'), self::$user_id));
 
         endif;
 
