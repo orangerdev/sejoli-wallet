@@ -90,8 +90,100 @@ class Json extends \SejoliSA\JSON {
                         'available_cash'  => sejolisa_price_format($_data->available_cash),
                         'available_total' => sejolisa_price_format($_data->available_total),
                         'detail_url'      => add_query_arg(array(
-                                                'page'  => 'sejoli-wallet',
+                                                'page'    => 'sejoli-wallet',
+												'user_id' => $_data->user_id
                                             ), admin_url('admin.php'))
+                    );
+
+                endforeach;
+
+                $total = count($data);
+
+            endif;
+
+        endif;
+
+        echo wp_send_json([
+            'table'           => $table,
+            'draw'            => $table['draw'],
+            'data'            => $data,
+            'recordsTotal'    => $total,
+            'recordsFiltered' => $total
+        ]);
+
+        exit;
+    }
+
+	/**
+     * Get wallet history for a user
+     * Hooked via filter wp_ajax_sejoli-single-wallet-table, priority 1
+     * @since   1.0.0
+     * @return  array
+     */
+    public function ajax_set_single_user_for_table() {
+
+        $table  = $this->set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce' 	=> NULL,
+			'user_id'   => NULL
+        ));
+
+        $total = 0;
+        $data  = [];
+
+        if(wp_verify_nonce($params['nonce'], 'sejoli-render-single-wallet-table')) :
+
+			$table['filter']['user_id']	= (empty($params['user_id'])) ? get_current_user_id() : intval($params['user_id']);
+
+    		$return = sejoli_wallet_get_history($table['filter'], $table);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['wallet'] as $_data) :
+
+					$detail = '';
+
+					switch($_data->label) :
+
+						case 'cashback' :
+							$product = sejolisa_get_product($_data->product_id);
+							$detail  = sprintf(
+											__('Cashback dari order %s untuk produk %s', 'sejoli'),
+											$_data->order_id,
+											$product->post_title
+									   );
+							break;
+
+						case 'affiliate' :
+							$product = sejolisa_get_product($_data->product_id);
+							$detail  = sprintf(
+											__('Poin dari affiliasi order %s untuk produk %s, tier %s', 'sejoli'),
+											$_data->order_id,
+											$product->post_title,
+											$_data->meta_data['tier']
+										);
+							break;
+
+						case 'order' :
+
+							$detail = sprintf(
+										__('Pembayaran untuk order %s', 'sejoli'),
+										$_data->order_id
+									  );
+							break;
+
+						case 'request' :
+
+							$detail = __('Request pencarian', 'sejoli');
+							break;
+
+					endswitch;
+
+                    $data[] = array(
+						'created_at' => date('Y/m/d', strtotime($_data->created_at)),
+						'detail'   	 => $detail,
+                        'point' 	 => sejolisa_price_format($_data->value),
+                        'type'  	 => $_data->type
                     );
 
                 endforeach;

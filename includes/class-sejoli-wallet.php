@@ -192,7 +192,9 @@ class Sejoli_Wallet {
 
 		$json 	 = new Sejoli_Wallet\Admin\Json( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_ajax_sejoli-wallet-table',	$json, 'ajax_set_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-wallet-table',			$json, 'ajax_set_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-single-wallet-table',	$json, 'ajax_set_single_user_for_table', 1);
+		$this->loader->add_action( 'sejoli_ajax_single-wallet-table',		$json, 'ajax_set_single_user_for_table', 1);
 
 		$product = new Sejoli_Wallet\Admin\Product( $this->get_plugin_name(), $this->get_version() );
 

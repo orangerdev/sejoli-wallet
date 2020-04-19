@@ -230,3 +230,65 @@ function sejoli_get_all_user_wallet($args = array()) {
 
     return $response;
 }
+
+/**
+ * Get wallet history
+ * @since   1.0.0
+ * @param   array  $args
+ * @param   array  $table
+ * @return  array
+ */
+function sejoli_wallet_get_history(array $args, $table = array()) {
+
+    $args = wp_parse_args($args,[
+        'user_id'     => NULL,
+        'product_id'  => NULL,
+        'reward_id'   => NULL,
+        'type'        => NULL,
+        'valid_point' => true
+    ]);
+
+    $table = wp_parse_args($table, [
+        'start'   => NULL,
+        'length'  => NULL,
+        'order'   => NULL,
+        'filter'  => NULL
+    ]);
+
+    if(isset($args['date-range']) && !empty($args['date-range'])) :
+        $table['filter']['date-range'] = $args['date-range'];
+        unset($args['date-range']);
+    endif;
+
+    $query = SEJOLI_WALLET\Model\Wallet::reset()
+                ->set_filter_from_array($args)
+                ->set_data_start($table['start']);
+
+    if(isset($table['filter']['date-range']) && !empty($table['filter']['date-range'])) :
+        list($start, $end) = explode(' - ', $table['filter']['date-range']);
+        $query = $query->set_filter('created_at', $start , '>=')
+                    ->set_filter('created_at', $end, '<=');
+    endif;
+
+    if(0 < $table['length']) :
+        $query->set_data_length($table['length']);
+    endif;
+
+    if(!is_null($table['order']) && is_array($table['order'])) :
+        foreach($table['order'] as $order) :
+            $query->set_data_order($order['column'], $order['sort']);
+        endforeach;
+    endif;
+
+    $response = $query->get()->respond();
+
+    foreach($response['wallet'] as $i => $point) :
+        $response['wallet'][$i]->meta_data = maybe_unserialize($point->meta_data);
+    endforeach;
+
+    return wp_parse_args($response,[
+        'valid'    => false,
+        'points'   => NULL,
+        'messages' => []
+    ]);
+}

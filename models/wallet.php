@@ -336,16 +336,16 @@ Class Wallet extends \SejoliSA\Model
         $query        = self::set_filter_query( $query );
         $recordsTotal = $query->count();
         $query        = self::set_length_query($query);
-        $points       = $query->get()->toArray();
+        $wallet       = $query->get()->toArray();
 
-        if ( $points ) :
+        if ( $wallet ) :
             self::set_respond('valid', true);
-            self::set_respond('points', $points);
+            self::set_respond('wallet', $wallet);
             self::set_respond('recordsTotal', $recordsTotal);
             self::set_respond('recordsFiltered', $recordsTotal);
         else:
             self::set_respond('valid', false);
-            self::set_respond('points', []);
+            self::set_respond('wallet', []);
             self::set_respond('recordsTotal', 0);
             self::set_respond('recordsFiltered', 0);
         endif;

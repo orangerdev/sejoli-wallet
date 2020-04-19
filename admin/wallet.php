@@ -111,6 +111,12 @@ class Wallet {
      * @return  void
      */
     public function display_wallet_page() {
-        require_once( plugin_dir_path( __FILE__ ) . 'partials/user-wallet.php' );
+
+		if(isset($_GET['user_id'])) :
+			$user 	= sejolisa_get_user(intval($_GET['user_id']));
+			require_once( plugin_dir_path( __FILE__ ) . 'partials/single-user-wallet.php' );
+		else :
+        	require_once( plugin_dir_path( __FILE__ ) . 'partials/user-wallet.php' );
+		endif;
     }
 }
