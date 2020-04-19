@@ -82,9 +82,73 @@ function sejoli_get_user_wallet_data($user_id = 0) {
     return wp_parse_args($response, array(
         'valid'    => false,
         'wallet'   => NULL,
-        'messages' => array()    
+        'messages' => array()
     ));
 
+}
+
+/**
+ * Use wallet data for example payment
+ * @since   1.0.0
+ * @param   float   $amount
+ * @param   integer $user_id
+ * @param   string  $label      Type of wallet use
+ * @param   array   $meta_data  Use wallet information
+ * @return  array   Response
+ */
+function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order', $meta_data = array()) {
+
+    $user_id  = (0 === $user_id) ? get_current_user_id() : $user_id;
+    $amount   = floatval($amount);
+    $valid    = false;
+    $messages = array();
+    $wallet_response = sejoli_get_user_wallet_data($user_id);
+
+    if(false !== $wallet_response['valid']) :
+
+        $wallet = $wallet_response['wallet'];
+
+        if(floatval($wallet->available_total) >= $amount ) :
+
+            $use_response = \SEJOLI_WALLET\Model\Wallet::reset()
+                                ->set_user_id($user_id)
+                                ->set_order_id($order_id)
+                                ->set_type('out')
+                                ->set_label($label)
+                                ->set_value($amount)
+                                ->set_meta_data($amount)
+                                ->use_wallet()
+                                ->respond();
+
+            if(false !== $use_response['valid']) :
+                $valid = true;
+                $messages['success'] = array(
+                    sprintf(
+                        __('Berhasil digunakan saldo anda sebesar %s', 'sejoli'),
+                        sejolisa_price_format($amount)
+                    )
+                );
+            else :
+                $messages = $use_response['messages'];
+            endif;
+        else :
+            $messages['error'] = array(
+                sprintf(
+                    __('Jumlah yang anda gunakan sebesar %s melebihi saldo yang tersedia yaitu %s', 'sejoli'),
+                    sejolisa_price_format($amount),
+                    sejolisa_price_format($wallet->available_total)
+                )
+            );
+        endif;
+    else :
+        $messages = $wallet_response['messages'];
+    endif;
+
+    return array(
+        'valid'    => $valid,
+        'wallet'   => NULL,
+        'messages' => $messages
+    );
 }
 
 /**

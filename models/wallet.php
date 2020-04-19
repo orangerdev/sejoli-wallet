@@ -135,6 +135,11 @@ Class Wallet extends \SejoliSA\Model
 
         if(in_array(self::$action, array('add'))) :
 
+            if(empty(self::$order_id)) :
+                self::set_valid(false);
+                self::set_message( __('Order ID tidak boleh kosong', 'sejoli'));
+            endif;
+
             if(!is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
                 self::set_valid(false);
                 self::set_message( __('Produk tidak valid', 'sejoli'));
@@ -457,10 +462,10 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Add point with OUT type
+     * Reduce wallet
      * @since   1.0.0
      */
-    static public function reduce_point() {
+    static public function use_wallet() {
 
         self::set_action('reduce');
         self::validate();
@@ -469,24 +474,24 @@ Class Wallet extends \SejoliSA\Model
 
             parent::$table = self::$table;
 
-            $point = [
+            $wallet = [
                 'created_at'   => current_time('mysql'),
-                'order_id'     => 0,
-                'order_status' => '',
+                'order_id'     => self::$order_id,
                 'product_id'   => 0,
                 'user_id'      => self::$user->ID,
-                'point'        => self::$point,
+                'value'        => self::$value,
+                'label'        => self::$label,
                 'type'         => 'out',
-                'wallet_id'    => self::$wallet_id,
+                'refundable'   => false,
                 'meta_data'    => serialize(self::$meta_data),
-                'valid_point'  => self::$valid_point
+                'valid_point'  => true
             ];
 
-            $point['ID'] = Capsule::table(self::table())
-                            ->insertGetId($point);
+            $wallet['ID'] = Capsule::table(self::table())
+                            ->insertGetId($wallet);
 
             self::set_valid(true);
-            self::set_respond('point', $point);
+            self::set_respond('wallet', $wallet);
 
         endif;
 

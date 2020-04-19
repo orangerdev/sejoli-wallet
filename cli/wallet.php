@@ -67,6 +67,36 @@ class Wallet extends \SejoliSA\CLI {
     }
 
     /**
+     * Use wallet
+     *
+     * <amount>
+     * : Amount of use
+     *
+     * <user_id>
+     * : Validity status
+     *
+     *  wp sejolisa wallet use_wallet 12300 14
+     *
+     * @when after_wp_load
+     */
+    public function use_wallet(array $args) {
+
+        list($amount, $user_id) = $args;
+
+        $response = sejoli_use_wallet($amount, $user_id);
+
+        if(false !== $response['valid']) :
+
+            __debug($response);
+
+        else :
+
+            $this->message($response['messages']['error'], 'error');
+
+        endif;
+    }
+
+    /**
      * Update wallet valid point
      *
      * <order_id>
