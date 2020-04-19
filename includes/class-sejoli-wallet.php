@@ -121,8 +121,10 @@ class Sejoli_Wallet {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/json.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/product.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/user.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/wallet.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -188,6 +190,10 @@ class Sejoli_Wallet {
 
 		$admin 	 = new Sejoli_Wallet\Admin( $this->get_plugin_name(), $this->get_version() );
 
+		$json 	 = new Sejoli_Wallet\Admin\Json( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'wp_ajax_sejoli-wallet-table',	$json, 'ajax_set_for_table', 1);
+
 		$product = new Sejoli_Wallet\Admin\Product( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_filter( 'sejoli/product/fields',					$product, 'set_product_fields', 	11);
@@ -198,6 +204,12 @@ class Sejoli_Wallet {
 		$user = new Sejoli_Wallet\Admin\User( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_filter( 'sejoli/user-group/detail',				$user, 'set_user_group_detail', 11, 4);
+
+		$wallet = new Sejoli_Wallet\Admin\Wallet( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_filter( 'sejoli/admin/is-sejoli-page', 	$wallet, 'is_current_page_sejoli_page', 1111);
+		$this->loader->add_filter( 'sejoli/admin/js-localize-data',	$wallet, 'set_localize_js_vars', 11);
+		$this->loader->add_action( 'admin_menu',					$wallet, 'add_sejoli_submenu', 1002);
 	}
 
 	/**

@@ -354,10 +354,10 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Get available all user point
+     * Get available all user wallet
      * @since   1.0.0
      */
-    static public function get_available_point_all_users() {
+    static public function get_all_user_wallet() {
 
         global $wpdb;
 
@@ -369,23 +369,32 @@ Class Wallet extends \SejoliSA\Model
                         'user.display_name',
                         'user.user_email',
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "in" AND refundable = "1" THEN point ELSE 0 END) AS wallet_cash'
+                            'SUM(CASE WHEN type = "in" AND refundable = 1 THEN value ELSE 0 END) AS cash_value'
                         ),
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "in" AND refundable = "0" THEN point ELSE 0 END) AS wallet_point'
+                            'SUM(CASE WHEN type = "in" AND refundable = 0 THEN value ELSE 0 END) AS point_value' // Non refundable
                         ),
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "out" THEN point ELSE 0 END) AS wallet_refund'
+                            'SUM(CASE WHEN type = "out" THEN value ELSE 0 END) AS used_value'
                         ),
                         Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE -point END) AS available_point'
+                            'SUM(
+                                CASE
+                                    WHEN type = "in" AND refundable = 1 THEN value
+                                    WHEN type = "in" AND refundable = 0 THEN 0
+                                    ELSE -value
+                                END
+                             ) AS available_cash'
+                        ),
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "in" THEN value ELSE -value END) AS available_total'
                         )
                     )
                     ->join(
                         $wpdb->users . ' AS user', 'user.ID', '=', 'wallet.user_id'
                     )
                     ->where('valid_point', true)
-                    ->orderBy('available_point', 'DESC')
+                    ->orderBy('available_total', 'DESC')
                     ->groupBy('user_id');
 
         $query  = self::set_filter_query( $query );
@@ -395,7 +404,7 @@ Class Wallet extends \SejoliSA\Model
         if($result) :
 
             self::set_valid(true);
-            self::set_respond('points', $result);
+            self::set_respond('wallet', $result);
 
         else :
 

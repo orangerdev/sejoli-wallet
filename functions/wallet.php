@@ -212,3 +212,21 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     );
 
 }
+
+/**
+ * Get available all user point
+ * @since   1.0.0
+ * @param   array  $args
+ * @return  array
+ */
+function sejoli_get_all_user_wallet($args = array()) {
+    $args = wp_parse_args($args, array(
+                'user_id' => NULL
+            ));
+    $response    = \SEJOLI_WALLET\Model\Wallet::reset()
+                    ->set_filter_from_array($args)
+                    ->get_all_user_wallet()
+                    ->respond();
+
+    return $response;
+}
