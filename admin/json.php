@@ -174,7 +174,7 @@ class Json extends \SejoliSA\JSON {
 
 						case 'request' :
 
-							$detail = __('Request pencarian', 'sejoli');
+							$detail = __('Request pencairan', 'sejoli');
 							break;
 
 					endswitch;
