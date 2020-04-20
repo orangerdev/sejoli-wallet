@@ -122,6 +122,7 @@ class Sejoli_Wallet {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/json.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/notification.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/product.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/user.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/wallet.php';
@@ -196,6 +197,16 @@ class Sejoli_Wallet {
 		$this->loader->add_action( 'wp_ajax_sejoli-wallet-table',			$json, 'ajax_set_for_table', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-single-wallet-table',	$json, 'ajax_set_single_user_for_table', 1);
 		$this->loader->add_action( 'sejoli_ajax_single-wallet-table',		$json, 'ajax_set_single_user_for_table', 1);
+
+		$notification = new Sejoli_Wallet\Admin\Notification( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_filter( 'sejoli/email/template-directory',		$notification, 'set_notification_directory', 11, 4);
+		$this->loader->add_filter( 'sejoli/sms/template-directory',			$notification, 'set_notification_directory', 11, 4);
+		$this->loader->add_filter( 'sejoli/whatsapp/template-directory',	$notification, 'set_notification_directory', 11, 4);
+
+		$this->loader->add_filter( 'sejoli/notification/libraries',						$notification, 'add_libraries', 11);
+		$this->loader->add_action( 'sejoli/notification/wallet/request-fund',			$notification, 'send_request_fund_notification', 11);
+		$this->loader->add_action( 'sejoli/notification/wallet/cancel-request-fund',	$notification, 'send_cancel_request_fund_notification', 11);
 
 		$product = new Sejoli_Wallet\Admin\Product( $this->get_plugin_name(), $this->get_version() );
 
