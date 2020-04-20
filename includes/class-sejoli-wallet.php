@@ -204,6 +204,7 @@ class Sejoli_Wallet {
 		$this->loader->add_filter( 'sejoli/sms/template-directory',			$notification, 'set_notification_directory', 11, 4);
 		$this->loader->add_filter( 'sejoli/whatsapp/template-directory',	$notification, 'set_notification_directory', 11, 4);
 
+		$this->loader->add_filter( 'sejoli/notification/fields',    					$notification, 'set_notification_fields', 111);
 		$this->loader->add_filter( 'sejoli/notification/libraries',						$notification, 'add_libraries', 11);
 		$this->loader->add_action( 'sejoli/notification/wallet/request-fund',			$notification, 'send_request_fund_notification', 11);
 		$this->loader->add_action( 'sejoli/notification/wallet/cancel-request-fund',	$notification, 'send_cancel_request_fund_notification', 11);

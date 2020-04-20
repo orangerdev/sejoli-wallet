@@ -2,6 +2,9 @@
 
 namespace Sejoli_Wallet\Admin;
 
+use Carbon_Fields\Container;
+use Carbon_Fields\Field;
+
 class Notification {
 
     /**
@@ -89,6 +92,44 @@ class Notification {
 
         return $libraries;
     }
+
+	/**
+	 * Add notification setting fields
+	 * Hooke via filter sejoli/notification/fields, priority 111
+	 * @since 	1.0.0
+	 * @param 	array $fields
+	 */
+	public function set_notification_fields(array $fields) {
+
+		$fields['cashback'] = [
+			'title'		=> __('Informasi Cashback', 'sejoli'),
+			'fields'	=> array(
+				Field::make('separator', 'sep_info_cashback_email', __('Email', 'sejoli'))
+					->set_help_text(__('Pengturan konten untuk media email', 'sejoli')),
+
+				Field::make('rich_text', 'info_cashback_email', __('Konten', 'sejoli'))
+					->set_required(true)
+					->set_default_value('Selamat, Anda mendapatkan poin sebesar {{cashback}}! Total dana anda sekarang adalah {{wallet-total}}'),
+
+				Field::make('separator', 'sep_info_cashback_whatsapp', __('Whatsapp', 'sejoli'))
+					->set_help_text(__('Pengturan konten untuk media whatsapp', 'sejoli')),
+
+				Field::make('textarea', 'info_cashback_whatsapp', __('Konten', 'sejoli'))
+					->set_required(true)
+					->set_default_value('Selamat, Anda mendapatkan poin sebesar {{cashback}}! Total dana anda sekarang adalah {{wallet-total}}.'),
+
+				Field::make('separator', 'sep_info_cashback_sms', __('SMS', 'sejoli'))
+					->set_help_text(__('Pengturan konten untuk media SMS', 'sejoli')),
+
+				Field::make('textarea', 'info_cashback_sms', __('Konten', 'sejoli'))
+					->set_required(true)
+					->set_default_value('Total dana anda sekarang {{wallet-total}}'),
+
+			)
+		];
+
+		return $fields;
+	}
 
 	/**
 	 * Send request fund notification
