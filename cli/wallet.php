@@ -274,4 +274,34 @@ class Wallet extends \SejoliSA\CLI {
         ));
     }
 
+    /**
+     * Get single cashback info from an order
+     *
+     * <order_id>
+     * : The order id
+     *
+     *  wp sejolisa wallet check_order 2193
+     *
+     * @when after_wp_load
+     */
+    public function check_order(array $args) {
+
+        list($order_id) = $args;
+
+        $response = sejolisa_get_order(array('ID' => $order_id));
+
+        if(false !== $response['valid']) :
+
+            $order = $response['orders'];
+
+            $cashback_response = sejoli_get_single_user_cashback_from_an_order(array(
+                'order_id'  => $order['ID'],
+                'user_id'   => $order['user_id']
+            ));
+
+            __debug($cashback_response);
+
+        endif;
+
+    }
 }

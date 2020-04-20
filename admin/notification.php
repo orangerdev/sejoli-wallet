@@ -49,6 +49,13 @@ class Notification {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		add_action('admin_init',	array($this, 'test'));
+	}
+
+	public function test() {
+		if(isset($_GET['dylan'])) :
+			exit;
+		endif;
 	}
 
     /**

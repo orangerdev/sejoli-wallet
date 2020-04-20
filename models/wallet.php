@@ -224,10 +224,10 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Get single user wallet point from an order
+     * Get single user wallet cashback from an order
      * @since   1.0.0
      */
-    static public function get_single_point() {
+    static public function get_single_cashback() {
 
         self::set_action('get-single');
         self::validate();

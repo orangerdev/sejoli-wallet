@@ -121,6 +121,7 @@ class Sejoli_Wallet {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/order.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/json.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/notification.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/product.php';
@@ -208,6 +209,17 @@ class Sejoli_Wallet {
 		$this->loader->add_filter( 'sejoli/notification/libraries',						$notification, 'add_libraries', 11);
 		$this->loader->add_action( 'sejoli/notification/wallet/request-fund',			$notification, 'send_request_fund_notification', 11);
 		$this->loader->add_action( 'sejoli/notification/wallet/cancel-request-fund',	$notification, 'send_cancel_request_fund_notification', 11);
+
+		$order = new Sejoli_Wallet\Admin\Order( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'sejoli/order/new',							$order, 'add_cashback_for_buyer', 			   8);
+		$this->loader->add_action( 'sejoli/order/set-status/on-hold',			$order, 'update_cashback_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/in-progress',		$order, 'update_cashback_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/shipped',			$order, 'update_cashback_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/refunded',			$order, 'update_cashback_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/cancelled',			$order, 'update_cashback_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/completed',			$order, 'update_cashback_status_to_valid', 	   111);
+		$this->loader->add_action( 'sejoli/notification/content/order-detail',	$order, 'add_cashback_info',				   111, 4);
 
 		$product = new Sejoli_Wallet\Admin\Product( $this->get_plugin_name(), $this->get_version() );
 

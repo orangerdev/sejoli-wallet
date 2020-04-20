@@ -40,20 +40,15 @@ function sejoli_add_cashback($args) {
 /**
  * Update wallet valid point
  * @since   1.0.0
- * @param   array   $args
- * @return  array   Response
+ * @param   integer     $order_id
+ * @param   boolean     $valid
+ * @return  array       Response
  */
-function sejoli_update_wallet_valid_point($args) {
-
-    $args = wp_parse_args($args, array(
-        'order_id'    => NULL,
-        'user_id'     => NULL,
-        'valid_point' => false
-    ));
+function sejoli_update_wallet_valid_point($order_id, $valid = false) {
 
     $response   =  \SEJOLI_WALLET\Model\Wallet::reset()
-                        ->set_order_id($args['order_id'])
-                        ->set_valid_point($args['valid_point'])
+                        ->set_order_id($order_id)
+                        ->set_valid_point($valid)
                         ->update_valid_point()
                         ->respond();
 
@@ -85,6 +80,28 @@ function sejoli_get_user_wallet_data($user_id = 0) {
         'messages' => array()
     ));
 
+}
+
+/**
+ * Get cashback from an order
+ * @since   1.0.0
+ * @param   array   $args
+ * @return  array   Response
+ */
+function sejoli_get_single_user_cashback_from_an_order($args) {
+
+    $args = wp_parse_args($args, array(
+        'order_id'  => NULL,
+        'user_id'   => NULL
+    ));
+
+    $response = \SEJOLI_WALLET\Model\Wallet::reset()
+                    ->set_user($args['user_id'])
+                    ->set_order_id($args['order_id'])
+                    ->get_single_cashback()
+                    ->respond();
+
+    return $response;
 }
 
 /**
