@@ -138,7 +138,10 @@ class Sejoli_Wallet {
 		/**
 		 * The class responsible for defining CLI command
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'cli/wallet.php';
+		if ( class_exists( 'WP_CLI' ) ) :
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'cli/wallet.php';
+		endif;
+
 
 		/**
 		 * Routine functions
