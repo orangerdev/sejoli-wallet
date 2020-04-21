@@ -1,12 +1,12 @@
 <?php
     printf(
         __('Pencairan dana sebesar %s telah dibatalkan oleh kami.', 'sejoli'),
-        '{{wallet-value}}'
+        '{{request-fund}}'
     );
 ?>&nbsp;
 
 <?php
     printf(
         __('Dana sebesar %s telah kami kembalikan ke saldo membership anda.', 'sejoli'),
-        '{{wallet-value}}'
+        '{{request-fund}}'
     );

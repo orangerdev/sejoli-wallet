@@ -1,7 +1,7 @@
 <?php
     printf(
         __('Pencairan dana sebesar %s oleh %s telah dibatalkan.', 'sejoli'),
-        '{{wallet-value}}',
+        '{{request-fund}}',
         '{{buyer-name}}'
     );
 ?>&nbsp;
@@ -10,5 +10,5 @@
 <?php
     printf(
         __('Dana sebesar %s telah dikembalikan ke saldo.', 'sejoli'),
-        '{{wallet-value}}'
+        '{{request-fund}}'
     );

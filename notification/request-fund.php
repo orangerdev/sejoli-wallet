@@ -60,7 +60,7 @@ class RequestFund extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 	'request_fund_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('{{user-name}}, anda telah melakukan pencairan dana sebesar {{wallet-value}}', 'sejoli')),
+					->set_default_value(__('{{user-name}}, anda telah melakukan pencairan dana sebesar {{request-fund}}', 'sejoli')),
 
 				Field::make('rich_text', 'request_fund_email_content', __('Konten', 'sejoli'))
 					->set_required(true)
@@ -105,7 +105,7 @@ class RequestFund extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 		'request_fund_admin_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('{{user-name}} telah meminta pencairan dana sebesar {{wallet-value}}', 'sejoli'))
+					->set_default_value(__('{{user-name}} telah meminta pencairan dana sebesar {{request-fund}}', 'sejoli'))
 					->set_conditional_logic([
 						[
 							'field'	=> 'request_fund_admin_active',
@@ -279,11 +279,15 @@ class RequestFund extends \SejoliSA\Notification\Main {
      */
     public function add_shortcode_detail(array $shortcodes) {
 
-        $shortcodes['{{site-url}}']       = home_url('/');
-        $shortcodes['{{user-name}}']      = $this->user_data['user_name'];
-        $shortcodes['{{buyer-name}}']     = $this->user_data['user_name'];
-        $shortcodes['{{wallet-value}}']    = $this->wallet_data['reward-name'];
-        $shortcodes['{{request-fund}}'] = $this->wallet_data['point'];
+        $meta_data = wp_parse_args(maybe_unserialize($this->wallet_data['meta_data']), array(
+                        'note'  => NULL
+                     ));
+
+        $shortcodes['{{site-url}}']     = home_url('/');
+        $shortcodes['{{user-name}}']    = $this->user_data['user_name'];
+        $shortcodes['{{buyer-name}}']   = $this->user_data['user_name'];
+        $shortcodes['{{request-fund}}'] = sejolisa_price_format($this->wallet_data['value']);
+        $shortcodes['{{instruction}}']  = $meta_data['note'];
 
         return $shortcodes;
     }

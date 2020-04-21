@@ -60,7 +60,7 @@ class CancelRequestFund extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 	'cancel_request_fund_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('{{user-name}}, pencairan dana sebesar {{wallet-value}} dibatalkan', 'sejoli')),
+					->set_default_value(__('{{user-name}}, pencairan dana sebesar {{request-fund}} dibatalkan', 'sejoli')),
 
 				Field::make('rich_text', 'cancel_request_fund_email_content', __('Konten', 'sejoli'))
 					->set_required(true)
@@ -105,7 +105,7 @@ class CancelRequestFund extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 		'cancel_request_fund_admin_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('Pencairan dana sebesar {{wallet-value}} untuk {{user-name}} telah dibatalkan', 'sejoli'))
+					->set_default_value(__('Pencairan dana sebesar {{request-fund}} untuk {{user-name}} telah dibatalkan', 'sejoli'))
 					->set_conditional_logic([
 						[
 							'field'	=> 'cancel_request_fund_admin_active',
@@ -282,7 +282,7 @@ class CancelRequestFund extends \SejoliSA\Notification\Main {
         $shortcodes['{{site-url}}']     = home_url('/');
         $shortcodes['{{user-name}}']    = $this->user_data['user_name'];
         $shortcodes['{{buyer-name}}']   = $this->user_data['user_name'];
-        $shortcodes['{{wallet-value}}'] = $this->wallet_data['reward-name'];
+        $shortcodes['{{request-fund}}'] = $this->wallet_data['reward-name'];
 
         return $shortcodes;
     }

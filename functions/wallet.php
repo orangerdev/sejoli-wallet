@@ -352,7 +352,7 @@ function sejoli_request_wallet_fund(array $args) {
                             ->respond();
 
             if(false !== $response['valid']) :
-                // do_action('sejoli/notification/wallet/request-fund', $response['wallet']);
+                do_action('sejoli/notification/wallet/request-fund', $response['wallet']);
             endif;
         endif;
 

@@ -155,7 +155,7 @@ class Notification {
 			array(
 				'user_name'  => $user->display_name,
 				'user_email' => $user->user_email,
-				'user_phone' => $user->meta->user_phone
+				'user_phone' => $user->meta->phone
 			));
 
 	}

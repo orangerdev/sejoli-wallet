@@ -3,7 +3,7 @@
     printf(
         __('%s telah melakukan permintaan pencairan dana sebesar %s.', 'sejoli'),
         '{{buyer-name}}',
-        '{{wallet-value}}'
+        '{{request-fund}}'
     );
 ?>
 </p>
