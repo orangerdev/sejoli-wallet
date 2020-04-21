@@ -309,3 +309,54 @@ function sejoli_wallet_get_history(array $args, $table = array()) {
         'messages' => []
     ]);
 }
+
+/**
+ * Request wallet fund
+ * @since   1.0.0
+ * @param   array    $args
+ * @return  array    Response
+ */
+function sejoli_request_wallet_fund(array $args) {
+
+    $user_id = get_current_user_id();
+    $args    = wp_parse_args($args, array(
+                    'value' => $amount,
+                    'note'  => NULL
+                ));
+
+    $response = sejoli_get_user_wallet_data($user_id);
+
+    if(false !== $response['valid']) :
+
+        $wallet = $response['wallet'];
+
+        if(floatval($args['value']) > floatval($wallet->available_cash)) :
+
+            $response = array(
+                'valid'    => false,
+                'messages' => array(
+                    'error' => array(
+                        __('Jumlah yang anda minta untuk pencairan melebihi dana yang tersedia di akun anda', 'sejoli')
+                    )
+                )
+            );
+
+        else :
+
+            $response = \SEJOLI_WALLET\Model\Wallet::reset()
+                            ->set_user_id($user_id)
+                            ->set_value($args['value'])
+                            ->set_label('request')
+                            ->set_meta_data(array('note' => $args['note']))
+                            ->request_fund()
+                            ->respond();
+
+            if(false !== $response['valid']) :
+                // do_action('sejoli/notification/wallet/request-fund', $response['wallet']);
+            endif;
+        endif;
+
+    endif;
+
+    return $response;
+}

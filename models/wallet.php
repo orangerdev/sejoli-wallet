@@ -96,7 +96,7 @@ Class Wallet extends \SejoliSA\Model
      */
     static protected function validate() {
 
-        if(in_array(self::$action, array('add', 'reduce'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'request'))) :
 
             if(empty(self::$value)) :
                 self::set_valid(false);
@@ -124,7 +124,7 @@ Class Wallet extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add', 'update-valid-point', 'get-single'))) :
+        if(in_array(self::$action, array('add', 'update-valid-point', 'get-single', 'reduce'))) :
 
             if(empty(self::$order_id)) :
                 self::set_valid(false);
@@ -527,6 +527,43 @@ Class Wallet extends \SejoliSA\Model
                             ));
 
             self::set_valid(true);
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Requet fund
+     * @since   1.0.0
+     */
+    static public function request_fund() {
+
+        self::set_action('request');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            $wallet = [
+                'created_at'   => current_time('mysql'),
+                'order_id'     => 0,
+                'product_id'   => 0,
+                'user_id'      => self::$user->ID,
+                'value'        => self::$value,
+                'label'        => self::$label,
+                'type'         => 'out',
+                'refundable'   => false,
+                'meta_data'    => serialize(self::$meta_data),
+                'valid_point'  => true
+            ];
+
+            $wallet['ID'] = Capsule::table(self::table())
+                            ->insertGetId($wallet);
+
+            self::set_valid(true);
+            self::set_respond('wallet', $wallet);
 
         endif;
 

@@ -180,10 +180,11 @@ class Json extends \SejoliSA\JSON {
 					endswitch;
 
                     $data[] = array(
-						'created_at' => date('Y/m/d', strtotime($_data->created_at)),
-						'detail'   	 => $detail,
-                        'point' 	 => sejolisa_price_format($_data->value),
-                        'type'  	 => $_data->type
+						'created_at'	=> date('Y/m/d', strtotime($_data->created_at)),
+						'detail'        => $detail,
+                        'point' 		=> sejolisa_price_format($_data->value),
+                        'type'  		=> $_data->type,
+						'refundable'    => boolval($_data->refundable)
                     );
 
                 endforeach;

@@ -7,6 +7,7 @@
             <th><?php _e('Detil', 'sejoli'); ?></th>
             <th><?php _e('Poin', 'sejoli'); ?></th>
             <th><?php _e('Tipe', 'sejoli'); ?></th>
+            <th><?php _e('Status', 'sejoli'); ?></th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +18,7 @@
             <th><?php _e('Detil', 'sejoli'); ?></th>
             <th><?php _e('Poin', 'sejoli'); ?></th>
             <th><?php _e('Tipe', 'sejoli'); ?></th>
+            <th><?php _e('Status', 'sejoli'); ?></th>
         </tr>
     </tfoot>
 </table>
@@ -69,6 +71,20 @@
                     className: 'center'
                 },{
                     targets: 3,
+                    width: '80px',
+                    data : 'refundable',
+                    className: 'center',
+                    render: function(data, meta, full) {
+                        if('out' === full.type) {
+                            return '-';
+                        } else if( true === data ) {
+                            return '<label class="ui blue label">Cash</label>';
+                        } else {
+                            return '<label class="ui purple label">Point</label>';
+                        }
+                    }
+                },{
+                    targets: 4,
                     width:  '80px',
                     data: 'type',
                     className: 'center',

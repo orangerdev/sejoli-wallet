@@ -134,6 +134,7 @@ class Sejoli_Wallet {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/member.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/wallet.php';
 
 		/**
 		 * The class responsible for defining CLI command
@@ -260,6 +261,9 @@ class Sejoli_Wallet {
 		$this->loader->add_filter( 'sejoli/member-area/menu-link',		$member, 'display_link_list_in_menu', 11, 4);
 		$this->loader->add_filter( 'sejoli/template-file',				$member, 'set_template_file', 111, 2);
 
+		$wallet = new Sejoli_Wallet\Front\Wallet( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'sejoli_ajax_submit-request-fund',	$wallet, 'submit_request_fund', 1);
 	}
 
 	/**
