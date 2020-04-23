@@ -115,7 +115,7 @@ Class Wallet extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add', 'reduce', 'get-single'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'get-single', 'cancel-request'))) :
 
             if(!is_a(self::$user, 'WP_User')) :
                 self::set_valid(false);
@@ -143,6 +143,15 @@ Class Wallet extends \SejoliSA\Model
             if(!is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
                 self::set_valid(false);
                 self::set_message( __('Produk tidak valid', 'sejoli'));
+            endif;
+
+        endif;
+
+        if(in_array(self::$action, array('cancel-request'))) :
+
+            if(empty(self::$id)) :
+                self::set_valid(false);
+                self::set_message( __('ID tidak boleh kosong', 'sejoli'));
             endif;
 
         endif;
@@ -534,7 +543,7 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
-     * Requet fund
+     * Request fund
      * @since   1.0.0
      */
     static public function request_fund() {
@@ -568,5 +577,38 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+    }
+
+    /**
+     * Cancel a request fund
+     * @since   1.0.0
+     */
+    static public function cancel_request_fund() {
+
+        self::set_action('cancel-request');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            parent::$table = self::$table;
+
+            $valid = Capsule::table(self::table())
+                            ->where(array(
+                                'ID'      => self::$id,
+                                'user_id' => self::$user->ID,
+                                'label'   => 'request',
+                                'type'    => 'out'
+                            ))
+                            ->update(array(
+                                'valid_point'   => false,
+                                'meta_data'     => serialize(self::$meta_data)
+                            ));
+
+            self::set_valid(boolval($valid));
+
+        endif;
+
     }
 }

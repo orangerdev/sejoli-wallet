@@ -237,6 +237,7 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
  * @return  array
  */
 function sejoli_get_all_user_wallet($args = array()) {
+
     $args = wp_parse_args($args, array(
                 'user_id' => NULL
             ));
@@ -260,10 +261,73 @@ function sejoli_wallet_get_history(array $args, $table = array()) {
     $args = wp_parse_args($args,[
         'user_id'     => NULL,
         'product_id'  => NULL,
-        'reward_id'   => NULL,
         'type'        => NULL,
         'valid_point' => true
     ]);
+
+    $table = wp_parse_args($table, [
+        'start'   => NULL,
+        'length'  => NULL,
+        'order'   => NULL,
+        'filter'  => NULL
+    ]);
+
+    if(isset($args['date-range']) && !empty($args['date-range'])) :
+        $table['filter']['date-range'] = $args['date-range'];
+        unset($args['date-range']);
+    endif;
+
+    $query = SEJOLI_WALLET\Model\Wallet::reset()
+                ->set_filter_from_array($args)
+                ->set_data_start($table['start']);
+
+    if(isset($table['filter']['date-range']) && !empty($table['filter']['date-range'])) :
+        list($start, $end) = explode(' - ', $table['filter']['date-range']);
+        $query = $query->set_filter('created_at', $start , '>=')
+                    ->set_filter('created_at', $end, '<=');
+    endif;
+
+    if(0 < $table['length']) :
+        $query->set_data_length($table['length']);
+    endif;
+
+    if(!is_null($table['order']) && is_array($table['order'])) :
+        foreach($table['order'] as $order) :
+            $query->set_data_order($order['column'], $order['sort']);
+        endforeach;
+    endif;
+
+    $response = $query->get()->respond();
+
+    foreach($response['wallet'] as $i => $point) :
+        $response['wallet'][$i]->meta_data = maybe_unserialize($point->meta_data);
+    endforeach;
+
+    return wp_parse_args($response,[
+        'valid'    => false,
+        'points'   => NULL,
+        'messages' => []
+    ]);
+}
+
+/**
+ * Get wallet history
+ * @since   1.0.0
+ * @param   array  $args
+ * @param   array  $table
+ * @return  array
+ */
+function sejoli_get_all_request_fund(array $args, $table = array()) {
+
+    $args = wp_parse_args($args,[
+        'user_id'     => NULL,
+        'type'        => NULL,
+        'label'       => NULL,
+        'valid_point' => true
+    ]);
+
+    $args['type']   = 'out';
+    $args['label']  = 'request';
 
     $table = wp_parse_args($table, [
         'start'   => NULL,
@@ -357,6 +421,35 @@ function sejoli_request_wallet_fund(array $args) {
         endif;
 
     endif;
+
+    return $response;
+}
+
+/**
+ * Cancel request fund
+ * @since   1.0.0
+ * @param   array    $args
+ * @return  array    Response
+ */
+function sejoli_cancel_request_refund(array $args) {
+
+    $args = wp_parse_args($args, array(
+        'id'        => NULL,
+        'user_id'   => NULL,
+        'meta_data' => array()
+    ));
+
+    $args['meta_data'] = wp_parse_args($args, array(
+        'note'   => NULL,
+        'reason' => NULL
+    ));
+
+    $response = \SEJOLI_WALLET\Model\Wallet::reset()
+                    ->set_id($args['id'])
+                    ->set_user_id($user_id)
+                    ->set_meta_data($args['meta_data'])
+                    ->cancel_request_fund()
+                    ->respond();
 
     return $response;
 }

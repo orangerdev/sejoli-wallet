@@ -205,4 +205,56 @@ class Json extends \SejoliSA\JSON {
 
         exit;
     }
+
+	/**
+     * Set for request fund table data via AJAX
+     * Hooked via action wp_ajax_sejoli-request-fund-table, priority 1
+     * @since   1.0.0
+     * @return  array
+     */
+    public function ajax_set_request_fund_for_table() {
+
+        $table  = $this->set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce' => NULL
+        ));
+
+        $total = 0;
+        $data  = [];
+
+        if(wp_verify_nonce($params['nonce'], 'sejoli-render-request-fund-table')) :
+
+    		$return = sejoli_get_all_request_fund($table['filter'], $table);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['wallet'] as $_data) :
+
+                    $data[] = array(
+						'created_at'   => date('Y/m/d', strtotime($_data->created_at)),
+                        'user_id'      => $_data->user_id,
+                        'display_name' => $_data->display_name,
+                        'user_email'   => $_data->user_email,
+                        'value'        => sejolisa_price_format($_data->value),
+                        'meta_data'    => maybe_unserialize($_data->meta_data)
+                    );
+
+                endforeach;
+
+                $total = count($data);
+
+            endif;
+
+        endif;
+
+        echo wp_send_json([
+            'table'           => $table,
+            'draw'            => $table['draw'],
+            'data'            => $data,
+            'recordsTotal'    => $total,
+            'recordsFiltered' => $total
+        ]);
+
+        exit;
+    }
 }

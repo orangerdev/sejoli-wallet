@@ -48,7 +48,7 @@ class Wallet {
 
 		if(
 			isset($_GET['page']) &&
-            'sejoli-wallet' === $_GET['page']
+            in_array($_GET['page'], array('sejoli-wallet', 'sejoli-request-fund'))
 		) :
 			return true;
 		endif;
@@ -80,7 +80,21 @@ class Wallet {
 				),
 				'nonce'   => wp_create_nonce('sejoli-render-single-wallet-table'),
 				'user_id' => (isset($_GET['user_id'])) ? intval($_GET['user_id']) : get_current_user_id()
-			)
+			),
+			'request_table' => array(
+				'ajaxurl'	=> add_query_arg(array(
+						'action' => 'sejoli-request-fund-table'
+					), admin_url('admin-ajax.php')
+				),
+				'nonce'	=> wp_create_nonce('sejoli-render-request-fund-table')
+			),
+			'update-request'	=> array(
+				'ajaxurl'	=> add_query_arg(array(
+						'action' => 'sejoli-update-request-fund'
+					), admin_url('admin-ajax.php')
+				),
+				'nonce'   => wp_create_nonce('sejoli-update-request-fund')
+			),
 		);
 
 		return $js_vars;
@@ -96,11 +110,20 @@ class Wallet {
 
         add_submenu_page(
             'crb_carbon_fields_container_sejoli.php',
-            __('Saldo', 'sejoli'),
+            __('Data Saldo Semua User', 'sejoli'),
             __('Saldo', 'sejoli'),
             'manage_sejoli_sejoli',
             'sejoli-wallet',
             array($this, 'display_wallet_page')
+        );
+
+		add_submenu_page(
+            'crb_carbon_fields_container_sejoli.php',
+            __('Data Permintaan Pencairan Dana', 'sejoli'),
+            __('Pencairan Dana', 'sejoli'),
+            'manage_sejoli_sejoli',
+            'sejoli-request-fund',
+            array($this, 'display_request_fund_page')
         );
 
 	}
@@ -118,5 +141,17 @@ class Wallet {
 		else :
         	require_once( plugin_dir_path( __FILE__ ) . 'partials/user-wallet.php' );
 		endif;
+
+    }
+
+	/**
+     * Display request fund page
+     * @since   1.0.0
+     * @return  void
+     */
+    public function display_request_fund_page() {
+
+        require_once( plugin_dir_path( __FILE__ ) . 'partials/request-fund.php' );
+
     }
 }
