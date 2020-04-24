@@ -109,11 +109,15 @@ let sejoli_table;
                     className: 'center'
                 },{
                     targets: 3,
-                    width:  '30%',
+                    width:  '140px',
                     data: 'meta_data',
                     className: 'center',
                     render: function(data, type, full) {
-                        return '-';
+
+                        let tmpl = $.templates('#request-action');
+                        data.id = full.id;
+                        
+                        return tmpl.render(data);
                     }
                 }
             ]
@@ -137,6 +141,49 @@ let sejoli_table;
             $('.sejoli-form-filter-holder').hide();
         });
 
+        $('body').on('click', '.request-information', function(){
+            let content = $(this).parent().parent().find('.detail-request-information').html();
+
+            $('.sejoli-request-information').find('.description').html(content);
+            $('.sejoli-request-information').modal('show');
+            return false;
+        });
+
+        function sejoli_update_request(request_id, type) {
+            let confirmed = confirm('<?php _e('Apakah anda yakin akan melakukan ini. Aksi ini tidak bisa diulang kembali', 'sejoli'); ?>');
+
+            if(confirmed) {
+                $.ajax({
+                    url : '<?php echo admin_url('admin-ajax.php'); ?>',
+                    type: 'POST',
+                    data: {
+                        action : 'sejoli-update-request',
+                        request_id : request_id,
+                        type : type,
+                        noncekey: '<?php echo wp_create_nonce('sejoli-update-request'); ?>'
+                    },
+                    beforeSend:function() {
+                        sejoli.helper.blockUI('#sejoli-wallet');
+                    },success:function(response) {
+
+                        sejoli.helper.unblockUI('#sejoli-wallet');
+                        sejoli_table.ajax.reload();
+
+                        alert(response.message);
+
+                    }
+                })
+            }
+        }
+
+        $('body').on('click', '.confirm-request', function(){
+            let request_id = $(this).data('request'),
+                request_action = $(this).data('type');
+
+            sejoli_update_request(request_id, request_action);
+
+            return false;
+        });
     });
 })(jQuery);
 </script>
@@ -146,3 +193,35 @@ let sejoli_table;
     <span class="ui purple label"><i class="envelope icon"></i>{{:email}}</span>
 </div>
 </script>
+<script id='request-action' type="text/x-jsrender">
+<div class='button-holder'>
+    {{if accepted }}
+    <span class="ui small green label">
+        <i class="checkmark icon"></i> {{:accepted}}
+    </span>
+    {{else}}
+    <div class="ui icon buttons">
+        <button class="ui button small red confirm-request" data-request='{{:id}}' data-type='reject'><i class="close icon"></i></button>
+        <button class="ui button small green confirm-request" data-request='{{:id}}' data-type='accept'><i class="check icon"></i></button>
+        <button class="ui button small blue request-information"><i class="info icon"></i></button>
+    </div>
+    <div class='detail-request-information' style='display:none'>{{:note}}</div>
+    {{/if}}
+</div>
+</script>
+<div class="sejoli-request-information ui small modal">
+    <i class="close icon"></i>
+    <div class="header">
+        <?php _e('Informasi Transfer', 'sejoli'); ?>
+    </div>
+    <div class="content">
+        <div class="description">
+        </div>
+    </div>
+    <div class="actions" style='margin-bottom:20px;padding-bottom:30px;'>
+        <div class="ui positive right labeled icon button">
+            <?php _e('Ok', 'sejoli'); ?>
+            <i class="checkmark icon"></i><br />
+        </div>
+    </div>
+</div>

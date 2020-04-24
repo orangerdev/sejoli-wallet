@@ -115,7 +115,7 @@ Class Wallet extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add', 'reduce', 'get-single', 'cancel-request'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'get-single'))) :
 
             if(!is_a(self::$user, 'WP_User')) :
                 self::set_valid(false);
@@ -147,7 +147,7 @@ Class Wallet extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('cancel-request'))) :
+        if(in_array(self::$action, array('update-request-fund'))) :
 
             if(empty(self::$id)) :
                 self::set_valid(false);
@@ -583,32 +583,31 @@ Class Wallet extends \SejoliSA\Model
      * Cancel a request fund
      * @since   1.0.0
      */
-    static public function cancel_request_fund() {
+    static public function update_request_fund() {
 
-        self::set_action('cancel-request');
+        self::set_action('update-request-fund');
         self::validate();
 
         if(false !== self::$valid) :
 
             parent::$table = self::$table;
 
-            parent::$table = self::$table;
-
             $valid = Capsule::table(self::table())
                             ->where(array(
                                 'ID'      => self::$id,
-                                'user_id' => self::$user->ID,
                                 'label'   => 'request',
                                 'type'    => 'out'
                             ))
                             ->update(array(
-                                'valid_point'   => false,
+                                'valid_point'   => self::$valid_point,
                                 'meta_data'     => serialize(self::$meta_data)
                             ));
 
             self::set_valid(boolval($valid));
 
         endif;
+
+        return new static;
 
     }
 }

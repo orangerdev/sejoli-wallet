@@ -426,29 +426,40 @@ function sejoli_request_wallet_fund(array $args) {
 }
 
 /**
- * Cancel request fund
+ * Get single wallet detail
+ * @since   1.0.0
+ * @param   integer $request_id
+ * @return  array   Response
+ */
+function sejoli_get_wallet_detail($request_id) {
+
+    $response = \SEJOLI_WALLET\Model\Wallet::reset()
+                    ->set_id($request_id)
+                    ->get_point_detail()
+                    ->respond();
+
+    return $response;
+}
+
+/**
+ * Update request fund status
  * @since   1.0.0
  * @param   array    $args
  * @return  array    Response
  */
-function sejoli_cancel_request_refund(array $args) {
+function sejoli_update_request_fund(array $args) {
 
     $args = wp_parse_args($args, array(
-        'id'        => NULL,
-        'user_id'   => NULL,
-        'meta_data' => array()
-    ));
-
-    $args['meta_data'] = wp_parse_args($args, array(
-        'note'   => NULL,
-        'reason' => NULL
+        'id'          => NULL,
+        'valid_point' => false,
+        'meta_data'   => array()
     ));
 
     $response = \SEJOLI_WALLET\Model\Wallet::reset()
                     ->set_id($args['id'])
-                    ->set_user_id($user_id)
+                    ->set_valid_point($args['valid_point'])
                     ->set_meta_data($args['meta_data'])
-                    ->cancel_request_fund()
+                    ->update_request_fund()
                     ->respond();
 
     return $response;

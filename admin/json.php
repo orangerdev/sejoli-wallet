@@ -228,9 +228,10 @@ class Json extends \SejoliSA\JSON {
 
             if(false !== $return['valid']) :
 
-                foreach($return['wallet'] as $_data) :
+                foreach($return['wallet'] as $i => $_data) :
 
-                    $data[] = array(
+                    $data[$i] = array(
+						'id'           => $_data->ID,
 						'created_at'   => date('Y/m/d', strtotime($_data->created_at)),
                         'user_id'      => $_data->user_id,
                         'display_name' => $_data->display_name,
@@ -238,6 +239,14 @@ class Json extends \SejoliSA\JSON {
                         'value'        => sejolisa_price_format($_data->value),
                         'meta_data'    => maybe_unserialize($_data->meta_data)
                     );
+
+					if(array_key_exists('note', $data[$i]['meta_data'])) :
+						$data[$i]['meta_data']['note'] = nl2br($data[$i]['meta_data']['note']);
+					endif;
+
+					if(array_key_exists('accepted', $data[$i]['meta_data'])) :
+						$data[$i]['meta_data']['accepted'] = date('d F Y', strtotime($data[$i]['meta_data']['accepted']));
+					endif;
 
                 endforeach;
 
@@ -257,4 +266,65 @@ class Json extends \SejoliSA\JSON {
 
         exit;
     }
+
+	/**
+	 * Update request status
+	 * Hooked via action wp_ajax_sejoli-update-request, priority 1
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	public function ajax_update_request_status() {
+
+		$response = array(
+			'valid'   => false,
+			'message' => __('Terjadi error saat mengupdate', 'sejoli')
+		);
+
+		$args 	= wp_parse_args($_POST, array(
+			'request_id' => NULL,
+			'type'       => NULL,
+			'noncekey'   => NULL
+		));
+
+		if(
+			wp_verify_nonce($args['noncekey'], 'sejoli-update-request') &&
+			!empty($args['request_id']) &&
+			!empty($args['type'])
+		) :
+
+			$point_response = sejoli_get_wallet_detail($args['request_id']);
+
+			if(false !== $point_response['valid']) :
+
+				$point              = (array) $point_response['point'];
+				$point['meta_data'] = maybe_unserialize($point['meta_data']);
+
+				$params = array(
+					'id'          => $point['ID'],
+					'valid_point' => boolval($point['valid_point']),
+					'meta_data'	  => $point['meta_data']
+				);
+
+				if('reject' === $args['type']) :
+
+					$params['valid_point'] = false;
+					$response['message'] = __('Permintaan pencairan dana telah dibatalkan', 'sejoli');
+
+				elseif('accept' === $args['type']) :
+
+					$params['meta_data']['accepted'] = current_time('mysql');
+					$response['message'] = __('Permintaan pencairan dana telah diterima', 'sejoli');
+
+				endif;
+
+				sejoli_update_request_fund($params);
+				$response['valid'] = true;
+
+			endif;
+
+		endif;
+
+		echo wp_send_json($response);
+		exit;
+	}
 }
