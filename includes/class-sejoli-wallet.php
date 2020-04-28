@@ -219,8 +219,11 @@ class Sejoli_Wallet {
 
 		$order = new Sejoli_Wallet\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'sejoli/order/grand-total',					$order, 'check_wallet_use',				   	   152, 2);
+		$this->loader->add_filter( 'sejoli/order/grand-total',					$order, 'check_wallet_use',				   	   152, 2);
+		$this->loader->add_filter( 'sejoli/order/grand-total',					$order, 'calculate_cashback',				   152, 2);
 		$this->loader->add_action( 'sejoli/order/cart-detail',					$order, 'add_cart_detail',					   152, 2);
+		$this->loader->add_filter( 'sejoli/order/meta-data', 					$order, 'set_order_meta_data',				   152, 2);
+		$this->loader->add_action( 'sejoli/order/new',							$order, 'add_wallet_use',					   8);
 		$this->loader->add_action( 'sejoli/order/new',							$order, 'add_cashback_for_buyer', 			   8);
 		$this->loader->add_action( 'sejoli/order/set-status/on-hold',			$order, 'update_cashback_status_to_not_valid', 111);
 		$this->loader->add_action( 'sejoli/order/set-status/in-progress',		$order, 'update_cashback_status_to_not_valid', 111);

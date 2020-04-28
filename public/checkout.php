@@ -130,7 +130,7 @@ class Checkout {
 
 				$(document).ready(function(){
 					$('body').on('change', '#use-wallet', function(){
-						sejoliSaCheckoutFisik.getCalculate();
+						sejoliSaCheckoutFisik.func.changeCalculate();
 					});
 				});
 			})(jQuery);

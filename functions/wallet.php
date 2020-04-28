@@ -171,7 +171,7 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
 /**
  * Calculate cashback by an order
  * @since   1.0.0
- * @param   array   $order
+ * @param   array   $order  Array with product_id and user_id
  * @param   integer $user_id
  * @return  array
  * - total          Total cashback
