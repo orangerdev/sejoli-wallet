@@ -37,13 +37,64 @@ class Checkout {
 
 	}
 
+	public function display_wallet_field(\WP_Post $product) {
+		$wallet_data = sejoli_get_user_wallet_data();
+
+		if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
+
+			$wallet = $wallet_data['wallet'];
+
+			if('digital' === $product->type) :
+	            ?>
+	            <tr>
+	                <th colspan='2'>
+						<h4><?php _e('Dana di dompet', 'sejoli'); ?></h4>
+	                    <p>
+							<label for="use-wallet">
+								<input type="checkbox" name="use-wallet" value="">
+								<span>
+								<?php
+									printf(
+										__('Dana yang tersedia %s, ini menggunakan dana yang ada untuk pembayaran?', 'sejoli'),
+										sejolisa_price_format($wallet->available_total)
+									);
+								?>
+							</label>
+						</p>
+	                </th>
+	            </tr><?php
+	        else :
+	            ?>
+	            <tr>
+					<td colspan='3'>
+						<h4><?php _e('Dana di dompet', 'sejoli'); ?></h4>
+						<p>
+							<label for="use-wallet">
+								<input type="checkbox" name="use-wallet" value="">
+								<span>
+									<?php
+										printf(
+											__('Dana yang tersedia %s, ingin menggunakan dana yang ada untuk pembayaran?', 'sejoli'),
+											sejolisa_price_format($wallet->available_total)
+										);
+									?>
+								</span>
+							</label>
+						</p>
+	                </td>
+	            </tr>
+	            <?php
+	        endif;
+		endif;
+	}
+
     /**
-     * Display customer available wallet
+     * Display potential cashback info
      * Hooked via sejoli/checout-template/after-product, priority 11
      * @param  WP_Post $product
      * @return void
      */
-    public function display_wallet(\WP_Post $product) {
+    public function display_cashback_info(\WP_Post $product) {
 
         if(false === $product->cashback['activate'] || 0.0 === floatval($product->cashback['amount'])) :
             return;

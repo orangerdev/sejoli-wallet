@@ -257,7 +257,8 @@ class Sejoli_Wallet {
 
 		$checkout = new Sejoli_Wallet\Front\Checkout( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'sejoli/checkout-template/after-product', $checkout, 'display_wallet', 11);
+		$this->loader->add_action( 'sejoli/checkout-template/after-product', $checkout, 'display_wallet_field', 11);
+		$this->loader->add_action( 'sejoli/checkout-template/after-product', $checkout, 'display_cashback_info', 11);
 
 		$front = new Sejoli_Wallet\Front( $this->get_plugin_name(), $this->get_version() );
 
