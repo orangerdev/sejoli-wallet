@@ -132,6 +132,7 @@ class Sejoli_Wallet {
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/checkout.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/member.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/wallet.php';
@@ -253,6 +254,10 @@ class Sejoli_Wallet {
 	 * @access   private
 	 */
 	private function define_public_hooks() {
+
+		$checkout = new Sejoli_Wallet\Front\Checkout( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'sejoli/checkout-template/after-product', $checkout, 'display_wallet', 11);
 
 		$front = new Sejoli_Wallet\Front( $this->get_plugin_name(), $this->get_version() );
 

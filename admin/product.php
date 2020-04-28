@@ -259,6 +259,7 @@ class Product {
 	public function set_product_cashback(\WP_Post $product) {
 
 		$setup 	    = 'general';
+		$max_amount = $amount = 0.0;
 		$activate   = carbon_get_post_meta($product->ID, 'cashback_activate');
 		$value      = carbon_get_post_meta($product->ID, 'cashback_value');
 		$type       = carbon_get_post_meta($product->ID, 'cashback_type');
@@ -300,7 +301,17 @@ class Product {
 
 		endif;
 
+		if(false !== $activate) :
+
+			if('percentage'=== $type) :
+				$amount = $value * $product->price / 100;
+			else :
+				$amount = $value;
+			endif;
+		endif;
+
 		$product->cashback = array(
+			'amount'	 => round($amount, 0),
 			'activate'   => boolval($activate),
 			'value'      => floatval($value),
 			'type'       => $type,
