@@ -24,6 +24,21 @@ class Checkout {
 	private $version;
 
 	/**
+	 * Set if current user is able to use wallet
+	 * @since	1.0.0
+	 * @access 	protected
+	 * @var 	boolean
+	 */
+	protected $enable_wallet = false;
+
+	/**
+	 * Set product
+	 * @since 	1.0.0
+	 * @var 	null|WP_Post
+	 */
+	protected $product;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -37,53 +52,25 @@ class Checkout {
 
 	}
 
+	/**
+	 * Display field to use wallet data
+	 * @since 	1.0.0
+	 * @param  	WP_Post $product
+	 * @return 	void
+	 */
 	public function display_wallet_field(\WP_Post $product) {
+
 		$wallet_data = sejoli_get_user_wallet_data();
 
 		if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
+			$this->enable_wallet = true;
 			$wallet = $wallet_data['wallet'];
 
 			if('digital' === $product->type) :
-	            ?>
-	            <tr>
-	                <th colspan='2'>
-						<h4><?php _e('Dana di dompet', 'sejoli'); ?></h4>
-	                    <p>
-							<label for="use-wallet">
-								<input type="checkbox" name="use-wallet" value="">
-								<span>
-								<?php
-									printf(
-										__('Dana yang tersedia %s, ini menggunakan dana yang ada untuk pembayaran?', 'sejoli'),
-										sejolisa_price_format($wallet->available_total)
-									);
-								?>
-							</label>
-						</p>
-	                </th>
-	            </tr><?php
+				require_once( plugin_dir_path( __FILE__ ) . '/partials/digital/wallet-field.php');
 	        else :
-	            ?>
-	            <tr>
-					<td colspan='3'>
-						<h4><?php _e('Dana di dompet', 'sejoli'); ?></h4>
-						<p>
-							<label for="use-wallet">
-								<input type="checkbox" name="use-wallet" value="">
-								<span>
-									<?php
-										printf(
-											__('Dana yang tersedia %s, ingin menggunakan dana yang ada untuk pembayaran?', 'sejoli'),
-											sejolisa_price_format($wallet->available_total)
-										);
-									?>
-								</span>
-							</label>
-						</p>
-	                </td>
-	            </tr>
-	            <?php
+				require_once( plugin_dir_path( __FILE__ ) . '/partials/physical/wallet-field.php');
 	        endif;
 		endif;
 	}
@@ -91,8 +78,9 @@ class Checkout {
     /**
      * Display potential cashback info
      * Hooked via sejoli/checout-template/after-product, priority 11
-     * @param  WP_Post $product
-     * @return void
+     * @since 	1.0.0
+     * @param  	WP_Post $product
+     * @return 	void
      */
     public function display_cashback_info(\WP_Post $product) {
 
@@ -100,39 +88,56 @@ class Checkout {
             return;
         endif;
 
+		$this->product = $product;
+
         if('digital' === $product->type) :
-            ?>
-            <tr>
-                <th>
-                    <?php if('digital' === $product->type || false === $product->enable_quantity) : ?>
-                    <p><?php _e('Potensi cashback yang anda dapatkan', 'sejoli'); ?></p>
-                    <?php else : ?>
-                    <p><?php _e('Potensi cashback yang anda dapatkan per satu item', 'sejoli'); ?></p>
-                    <?php endif; ?>
-                </th>
-                <th>
-                    <?php
-                        echo sejolisa_price_format($product->cashback['amount']);
-                    ?>
-                </th>
-            </tr><?php
+			require_once( plugin_dir_path( __FILE__ ) . '/partials/digital/cashback-info.php');
         else :
-            ?>
-            <tr>
-                <td colspan='2'>
-                    <?php if(false === $product->enable_quantity) : ?>
-					<p><?php _e('Potensi cashback yang anda dapatkan', 'sejoli'); ?></p>
-                    <?php else : ?>
-                    <p><?php _e('Potensi cashback yang anda dapatkan per satu item', 'sejoli'); ?></p>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <?php
-                        echo sejolisa_price_format($product->cashback['amount']);
-                    ?>
-                </td>
-            </tr>
-            <?php
+			require_once( plugin_dir_path( __FILE__ ) . '/partials/physical/cashback-info.php');
         endif;
     }
+
+	/**
+	 * Add JS script to calculate order wnen change the wallet field
+	 * Hooked via wp_footer, priority 999
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	public function add_js_script() {
+
+		if(is_singular('sejoli-product') && $this->enable_wallet) :
+
+			if('digital' === $this->product->type) :
+			?>
+			<script type="text/javascript">
+			(function($){
+				'use strict';
+
+				$(document).ready(function(){
+					$('body').on('change', '#use-wallet', function(){
+						sejoliSaCheckout.getCalculate();
+					});
+				});
+
+			})(jQuery);
+			</script>
+			<?php
+			else :
+			?>
+			<script type="text/javascript">
+			(function($){
+				'use strict';
+
+				$(document).ready(function(){
+					$('body').on('change', '#use-wallet', function(){
+						sejoliSaCheckoutFisik.getCalculate();
+					});
+				});
+			})(jQuery);
+			</script>
+			<?php
+			endif;
+		endif;
+
+	}
 }

@@ -51,6 +51,20 @@ class Order {
     protected $order_meta = array();
 
 	/**
+	 * State if current order use wallet
+	 * @since	1.0.0
+	 * @var 	booleans
+	 */
+	protected $order_use_wallet = false;
+
+	/**
+	 * Set wallet amount that use for order
+	 * @since	1.0.0
+	 * @var 	float;
+	 */
+	protected $wallet_amount = 0.0;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -62,6 +76,60 @@ class Order {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+	}
+
+	/**
+	 * Check if order use wallet
+	 * Hooked via action sejoli/order/grand-total, priority 152
+	 * @since 	1.0.0
+	 * @param  	array  $post_data
+	 * @return
+	 */
+	public function check_wallet_use($total, array $post_data) {
+		
+		if(array_key_exists('wallet', $post_data) && 'false' !== $post_data['wallet']) :
+
+			$wallet_data = sejoli_get_user_wallet_data();
+
+			if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
+
+				$subtotal = $total - floatval($wallet_data['wallet']->available_total);
+
+				if($subtotal < 0) :
+
+					$total = 0.0;
+					$this->wallet_amount = $total;
+
+				else :
+
+					$total = $subtotal;
+					$this->wallet_amount = $wallet_data['wallet']->available_total;
+
+				endif;
+
+				$this->order_use_wallet = true;
+			endif;
+
+
+		endif;
+
+		return $total;
+	}
+
+	/**
+	 * Add cart detail
+	 * Hooked via filter sejoli/order/cart-detail priority 152
+	 * @since 	1.0.0
+	 * @param 	array $detail
+	 * @param 	array $post_data
+	 */
+	public function add_cart_detail($detail, $post_data) {
+
+		if($this->order_use_wallet) :
+			$detail['wallet'] = $this->wallet_amount;
+		endif;
+
+		return $detail;
 	}
 
     /**
