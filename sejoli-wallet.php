@@ -16,7 +16,7 @@
  * Plugin Name:       Sejoli - Wallet
  * Plugin URI:        https://sejoli.co.id
  * Description:       Implement wallet system into SEJOLI premium membership WordPress plugin
- * Version:           1.0.0
+ * Version:           0.1.0
  * Author:            Ridwan Arifandi
  * Author URI:        https://ridwan-arifandi.com
  * License:           GPL-2.0+
@@ -34,10 +34,10 @@ global $sejoli_wallet;
 
 /**
  * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Start at version 0.1.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SEJOLI_WALLET_VERSION'	, '1.0.0' );
+define( 'SEJOLI_WALLET_VERSION'	, '0.1.0' );
 define( 'SEJOLI_WALLET_DIR' 	, plugin_dir_path( __FILE__ ) );
 define( 'SEJOLI_WALLET_URL' 	, plugin_dir_url( __FILE__ ) );
 
