@@ -82,7 +82,7 @@ class Member {
     public function register_menu( array $menu ) {
 
         $menu = array_slice($menu, 0, $this->menu_position, true) +
-                $this->member_menu +
+                array( $this->member_menu )+
                 array_slice($menu, $this->menu_position, count($menu) - 1, true);
 
         return $menu;

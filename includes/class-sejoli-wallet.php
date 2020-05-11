@@ -230,6 +230,8 @@ class Sejoli_Wallet {
 		$this->loader->add_action( 'sejoli/order/set-status/shipped',			$order, 'update_cashback_status_to_not_valid', 111);
 		$this->loader->add_action( 'sejoli/order/set-status/refunded',			$order, 'update_cashback_status_to_not_valid', 111);
 		$this->loader->add_action( 'sejoli/order/set-status/cancelled',			$order, 'update_cashback_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/refunded',			$order, 'update_wallet_use_status_to_not_valid', 111);
+		$this->loader->add_action( 'sejoli/order/set-status/cancelled',			$order, 'update_wallet_use_status_to_not_valid', 111);
 		$this->loader->add_action( 'sejoli/order/set-status/completed',			$order, 'update_cashback_status_to_valid', 	   111);
 		$this->loader->add_action( 'sejoli/notification/content/order-detail',	$order, 'add_cashback_info',				   111, 4);
 
