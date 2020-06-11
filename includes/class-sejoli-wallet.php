@@ -115,11 +115,27 @@ class Sejoli_Wallet {
 		/**
 		 * The class responsible for datatabase model
 		 */
+		if(!class_exists('\SejoliSA\Model')) :
+			$file = WP_PLUGIN_DIR. '/sejoli/models/main.php';
+			if(file_exists($file)) :
+				require_once($file);
+			endif;
+		endif;
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'models/wallet.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
+		 /**
+ 		 * The class responsible for datatabase model
+ 		 */
+ 		if(!class_exists('\SejoliSA\JSON')) :
+ 			$file = WP_PLUGIN_DIR. '/sejoli/json/main.php';
+ 			if(file_exists($file)) :
+ 				require_once($file);
+ 			endif;
+ 		endif;
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/order.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/json.php';
