@@ -93,10 +93,11 @@ Class Wallet extends \SejoliSA\Model
     /**
      * Validate property values based on action
      * @since   1.0.0
+     * @since   1.1.0   ignore $order_id and $product validation if self::$label is manual
      */
     static protected function validate() {
 
-        if(in_array(self::$action, array('add', 'reduce', 'request'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'request', 'manual-input'))) :
 
             if(empty(self::$value)) :
                 self::set_valid(false);
@@ -115,7 +116,7 @@ Class Wallet extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add', 'reduce', 'get-single'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'get-single', 'manual-input'))) :
 
             if(!is_a(self::$user, 'WP_User')) :
                 self::set_valid(false);
@@ -135,12 +136,7 @@ Class Wallet extends \SejoliSA\Model
 
         if(in_array(self::$action, array('add'))) :
 
-            if(empty(self::$order_id)) :
-                self::set_valid(false);
-                self::set_message( __('Order ID tidak boleh kosong', 'sejoli'));
-            endif;
-
-            if(!is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
+            if( !is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
                 self::set_valid(false);
                 self::set_message( __('Produk tidak valid', 'sejoli'));
             endif;
@@ -226,6 +222,44 @@ Class Wallet extends \SejoliSA\Model
                 );
 
             endif;
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Add data manually by access confirmed user
+     * @since   1.1.0
+     */
+    static public function manual_input() {
+
+        self::set_action('manual-input');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+
+            parent::$table = self::$table;
+
+            $wallet = [
+                'created_at'   => current_time('mysql'),
+                'order_id'     => 0,
+                'product_id'   => 0,
+                'user_id'      => self::$user->ID,
+                'value'        => self::$value,
+                'type'         => self::$type,
+                'label'        => self::$label,
+                'refundable'   => self::$refundable,
+                'valid_point'  => self::$valid_point,
+                'meta_data'    => serialize(self::$meta_data),
+            ];
+
+            $wallet['ID'] = Capsule::table(self::table())
+                            ->insertGetId($wallet);
+
+            self::set_valid     (true);
+            self::set_respond   ('wallet', $wallet);
 
         endif;
 
