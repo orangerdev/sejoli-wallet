@@ -264,9 +264,11 @@ class Sejoli_Wallet {
 
 		$wallet = new Sejoli_Wallet\Admin\Wallet( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_filter( 'sejoli/admin/is-sejoli-page', 	$wallet, 'is_current_page_sejoli_page', 1111);
-		$this->loader->add_filter( 'sejoli/admin/js-localize-data',	$wallet, 'set_localize_js_vars', 11);
-		$this->loader->add_action( 'admin_menu',					$wallet, 'add_sejoli_submenu', 1002);
+		$this->loader->add_action( 'admin_notices',							$wallet, 'display_notice',			1111);
+		$this->loader->add_action( 'wp_ajax_add-input-wallet-data',			$wallet, 'add_manual_input_data',	1);
+		$this->loader->add_filter( 'sejoli/admin/is-sejoli-page', 			$wallet, 'is_current_page_sejoli_page', 1111);
+		$this->loader->add_filter( 'sejoli/admin/js-localize-data',			$wallet, 'set_localize_js_vars', 11);
+		$this->loader->add_action( 'admin_menu',							$wallet, 'add_sejoli_submenu', 1002);
 	}
 
 	/**
