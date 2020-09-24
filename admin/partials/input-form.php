@@ -17,8 +17,7 @@
                         <?php _e('Saldo', 'sejoli'); ?>
                     </th>
                     <td>
-                        <input type="number" name="data[wallet]" class='regular-text sejoli-wallet-field' required value='0'/>
-                        <p class="description" id="sejoli-wallet">Diisi dengan pass yang anda gunakan di sejoli.id</p>
+                        <input type="number" id='sejoli-wallet' name="data[wallet]" class='regular-text sejoli-wallet-field' required value='0'/>
                     </td>
                 </tr>
                 <tr>
@@ -77,11 +76,14 @@
 
             let formData = new FormData($(this)[0]),
                 submitButton = $('#sejoli-add-button'),
-                notice = $('.sejoli-reset-data-response');
+                notice = $('.sejoli-wallet-form-response'),
+                confirmed = confirm('<?php _e('Anda yakin akan memproses form ini?', 'sejoli'); ?>');
 
             formData.append('action', 'add-input-wallet-data');
 
-            console.log(formData);
+            if( !confirmed ) {
+                return false;
+            }
 
             $.ajax({
                 type: 'POST',
@@ -102,11 +104,14 @@
                     if(response.success) {
                         notice.show()
                             .removeClass('notice-info notice-error')
-                            .addClass('notice-success').html(response.message);
+                            .addClass('notice-success').html('<p>' + response.message + '</p>');
+
+                        $('#sejoli-wallet').val(0);
+                        
                     } else {
                         notice.show()
                             .removeClass('notice-info notice-success')
-                            .addClass('notice-error').html(response.message);
+                            .addClass('notice-error').html('<p>' + response.message + '</p>');
                     }
 
                     submitButton.attr('disabled', false);
