@@ -179,7 +179,7 @@ class Json extends \SejoliSA\JSON {
 
 						case 'manual'	:
 
-							$detail	= $_data->meta_data['note'] . $_data->meta_data['input'];
+							$detail	= $_data->meta_data['note'] . ' ' . $_data->meta_data['input'];
 							break;
 
 					endswitch;
