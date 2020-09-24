@@ -177,6 +177,11 @@ class Json extends \SejoliSA\JSON {
 							$detail = __('Request pencairan', 'sejoli');
 							break;
 
+						case 'manual'	:
+
+							$detail	= $_data->meta_data['note'] . $_data->meta_data['input'];
+							break;
+
 					endswitch;
 
                     $data[] = array(
