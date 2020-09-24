@@ -464,3 +464,51 @@ function sejoli_update_request_fund(array $args) {
 
     return $response;
 }
+
+/**
+ * Manual input wallet
+ * @since   1.1.0
+ * @param   array   $args
+ * @return  array   Response
+ */
+function sejoli_manual_input_wallet( $args ) {
+
+    if( ! current_user_can('manage_sejoli_sejoli') ) :
+        return array(
+            'valid' => false,
+            'messages'  => array(
+                'error' => array(
+                    __('Current user doesn\'t have capability to process this function', 'sejoli')
+                )
+            )
+        );
+
+    endif;
+
+    $args = wp_parse_args($args, array(
+        'user_id'     => NULL,
+        'value'       => NULL,
+        'refundable'  => false,
+        'type'        => 'in',
+        'label'       => 'manual',
+        'valid_point' => false,
+        'meta_data'   => array()
+    ));
+
+    $response   =  \SEJOLI_WALLET\Model\Wallet::reset()
+                        ->set_user_id($args['user_id'])
+                        ->set_type($args['type'])
+                        ->set_value($args['value'])
+                        ->set_label($args['label'])
+                        ->set_refundable($args['refundable'])
+                        ->set_meta_data($args['meta_data'])
+                        ->set_valid_point($args['valid_point'])
+                        ->manual_input()
+                        ->respond();
+
+    return wp_parse_args($response, array(
+        'valid'    => false,
+        'wallet'   => NULL,
+        'messages' => array()
+    ));
+}
