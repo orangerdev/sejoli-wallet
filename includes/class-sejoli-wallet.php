@@ -214,6 +214,8 @@ class Sejoli_Wallet {
 
 		$admin 	 = new Sejoli_Wallet\Admin( $this->get_plugin_name(), $this->get_version() );
 
+		$this->loader->add_action( 'admin_enqueue_scripts',	$admin, 'enqueue_css_js_scripts', 1099);
+
 		$json 	 = new Sejoli_Wallet\Admin\Json( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_ajax_sejoli-wallet-table',			$json, 'ajax_set_for_table', 1);
