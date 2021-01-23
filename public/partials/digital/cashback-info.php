@@ -6,5 +6,7 @@
         <p><?php _e('Potensi cashback yang anda dapatkan per satu item', 'sejoli'); ?></p>
         <?php endif; ?>
     </th>
-    <th><?php echo sejolisa_price_format($product->cashback['amount']); ?></th>
+    <th id='sejowoo-cashback-potential'>
+        <?php echo sejolisa_price_format($product->cashback['amount']); ?>
+    </th>
 </tr>

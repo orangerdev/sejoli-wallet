@@ -64,6 +64,8 @@ class Checkout {
 
 		if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
+			$this->product = $product;
+
 			$this->enable_wallet = true;
 			$wallet = $wallet_data['wallet'];
 
@@ -88,7 +90,7 @@ class Checkout {
             return;
         endif;
 
-		$this->product = $product;
+		$this->product = ( !is_a($this->product, 'WP_Post') ) ? $product : $this->product;
 
         if('digital' === $product->type) :
 			require_once( plugin_dir_path( __FILE__ ) . '/partials/digital/cashback-info.php');
@@ -108,34 +110,9 @@ class Checkout {
 		if(is_singular('sejoli-product') && $this->enable_wallet) :
 
 			if('digital' === $this->product->type) :
-			?>
-			<script type="text/javascript">
-			(function($){
-				'use strict';
-
-				$(document).ready(function(){
-					$('body').on('change', '#use-wallet', function(){
-						sejoliSaCheckout.getCalculate();
-					});
-				});
-
-			})(jQuery);
-			</script>
-			<?php
+				require_once( plugin_dir_path( __FILE__ ) . 'partials/digital/footer-js.php');
 			else :
-			?>
-			<script type="text/javascript">
-			(function($){
-				'use strict';
-
-				$(document).ready(function(){
-					$('body').on('change', '#use-wallet', function(){
-						sejoliSaCheckoutFisik.func.changeCalculate();
-					});
-				});
-			})(jQuery);
-			</script>
-			<?php
+				require_once( plugin_dir_path( __FILE__ ) . 'partials/physical/footer-js.php');
 			endif;
 		endif;
 

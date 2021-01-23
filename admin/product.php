@@ -271,7 +271,10 @@ class Product {
 
 			$group = sejolisa_get_user_group();
 
-			if(false !== $group['cashback_activate']) :
+			if(
+				false !== $group &&
+				false !== $group['cashback_activate']
+			) :
 
 				$activate   = $group['cashback_activate'];
 				$value      = $group['cashback_value'];
@@ -281,7 +284,9 @@ class Product {
 				$setup 		= 'user-group';
 
 				if(
+					false !== $group &&
 					array_key_exists('per_product', $group) &&
+					is_array( $group['per_product'] ) && 0 < count( $group['per_product'] ) &&
 					array_key_exists($product->ID, $group['per_product']) &&
 					false !== $group['per_product'][$product->ID]['cashback_activate']
 				) :
@@ -304,7 +309,8 @@ class Product {
 		if(false !== $activate) :
 
 			if('percentage'=== $type) :
-				$amount = $value * $product->price / 100;
+				$price  = apply_filters('sejoli/product/price', $product->price, $product );
+				$amount = $value *  $price / 100;
 			else :
 				$amount = $value;
 			endif;
