@@ -3,8 +3,8 @@ Contributors: (this should be a list of wordpress.org userid's)
 Donate link: https://ridwan-arifandi.com
 Tags: membership, wallet, point, cashback
 Requires at least: 5.4.1
-Tested up to: 5.5.1
-Stable tag: 1.1.1
+Tested up to: 5.6.0
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,7 +40,8 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
-= 1.0 =
+= 1.1.2 =
+Fix several issue
 
 * 1.1.1 *
 Fix problem in select2 not loading
