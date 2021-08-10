@@ -35,6 +35,7 @@ function sejoli_add_cashback($args) {
         'wallet'   => NULL,
         'messages' => array()
     ));
+
 }
 
 /**
@@ -57,6 +58,7 @@ function sejoli_update_wallet_valid_point($order_id, $valid = false) {
         'wallet'   => NULL,
         'messages' => array()
     ));
+
 }
 
 /**
@@ -102,6 +104,7 @@ function sejoli_get_single_user_cashback_from_an_order($args) {
                     ->respond();
 
     return $response;
+
 }
 
 /**
@@ -138,6 +141,7 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
                                 ->respond();
 
             if(false !== $use_response['valid']) :
+                
                 $valid = true;
                 $messages['success'] = array(
                     sprintf(
@@ -145,10 +149,15 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
                         sejolisa_price_format($amount)
                     )
                 );
+            
             else :
+            
                 $messages = $use_response['messages'];
+            
             endif;
+       
         else :
+       
             $messages['error'] = array(
                 sprintf(
                     __('Jumlah yang anda gunakan sebesar %s melebihi saldo yang tersedia yaitu %s', 'sejoli'),
@@ -156,9 +165,13 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
                     sejolisa_price_format($wallet->available_total)
                 )
             );
+       
         endif;
+    
     else :
+    
         $messages = $wallet_response['messages'];
+    
     endif;
 
     return array(
@@ -166,6 +179,7 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
         'wallet'   => NULL,
         'messages' => $messages
     );
+
 }
 
 /**
@@ -183,7 +197,9 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     $current_user_id = get_current_user_id();
 
     if(0 !== $user_id) :
+        
         wp_set_current_user($user_id);
+    
     endif;
 
     $setup          = 'product';
@@ -192,6 +208,7 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     $product        = sejolisa_get_product($order['product_id'], true);
     $user_group     = sejolisa_get_user_group($order['user_id']);
     $buyer_group    = (isset($user_group['name'])) ? $user_group['name'] : '-';
+    $quantity       = (isset($order['quantity'])) ? $order['quantity'] : '1';
 
     if($product->cashback['activate']) :
 
@@ -201,7 +218,7 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
 
         else :
 
-            $total_cashback = $order['quantity'] * $product->cashback['value'];
+            $total_cashback = $quantity * $product->cashback['value'];
 
         endif;
 
@@ -209,7 +226,9 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
             0 < $product->cashback['max'] &&
             $total_cashback > $product->cashback['max']
         ) :
+    
             $total_cashback = $product->cashback['max'];
+    
         endif;
 
         $setup      = $product->cashback['setup'];
@@ -218,7 +237,9 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     endif;
 
     if(0 !== $user_id) :
+    
         wp_set_current_user($current_user_id);
+    
     endif;
 
     return array(
@@ -241,12 +262,13 @@ function sejoli_get_all_user_wallet($args = array()) {
     $args = wp_parse_args($args, array(
                 'user_id' => NULL
             ));
-    $response    = \SEJOLI_WALLET\Model\Wallet::reset()
+    $response   = \SEJOLI_WALLET\Model\Wallet::reset()
                     ->set_filter_from_array($args)
                     ->get_all_user_wallet()
                     ->respond();
 
     return $response;
+
 }
 
 /**
@@ -273,8 +295,10 @@ function sejoli_wallet_get_history(array $args, $table = array()) {
     ]);
 
     if(isset($args['date-range']) && !empty($args['date-range'])) :
+
         $table['filter']['date-range'] = $args['date-range'];
         unset($args['date-range']);
+
     endif;
 
     $query = SEJOLI_WALLET\Model\Wallet::reset()
@@ -282,25 +306,35 @@ function sejoli_wallet_get_history(array $args, $table = array()) {
                 ->set_data_start($table['start']);
 
     if(isset($table['filter']['date-range']) && !empty($table['filter']['date-range'])) :
+
         list($start, $end) = explode(' - ', $table['filter']['date-range']);
         $query = $query->set_filter('created_at', $start , '>=')
                     ->set_filter('created_at', $end, '<=');
+
     endif;
 
     if(0 < $table['length']) :
+
         $query->set_data_length($table['length']);
+
     endif;
 
     if(!is_null($table['order']) && is_array($table['order'])) :
+
         foreach($table['order'] as $order) :
+
             $query->set_data_order($order['column'], $order['sort']);
+
         endforeach;
+
     endif;
 
     $response = $query->get()->respond();
 
     foreach($response['wallet'] as $i => $point) :
+
         $response['wallet'][$i]->meta_data = maybe_unserialize($point->meta_data);
+
     endforeach;
 
     return wp_parse_args($response,[
@@ -308,6 +342,7 @@ function sejoli_wallet_get_history(array $args, $table = array()) {
         'points'   => NULL,
         'messages' => []
     ]);
+
 }
 
 /**
@@ -337,8 +372,10 @@ function sejoli_get_all_request_fund(array $args, $table = array()) {
     ]);
 
     if(isset($args['date-range']) && !empty($args['date-range'])) :
+
         $table['filter']['date-range'] = $args['date-range'];
         unset($args['date-range']);
+
     endif;
 
     $query = SEJOLI_WALLET\Model\Wallet::reset()
@@ -346,25 +383,35 @@ function sejoli_get_all_request_fund(array $args, $table = array()) {
                 ->set_data_start($table['start']);
 
     if(isset($table['filter']['date-range']) && !empty($table['filter']['date-range'])) :
+
         list($start, $end) = explode(' - ', $table['filter']['date-range']);
         $query = $query->set_filter('created_at', $start , '>=')
                     ->set_filter('created_at', $end, '<=');
+
     endif;
 
     if(0 < $table['length']) :
+
         $query->set_data_length($table['length']);
+
     endif;
 
     if(!is_null($table['order']) && is_array($table['order'])) :
+
         foreach($table['order'] as $order) :
+
             $query->set_data_order($order['column'], $order['sort']);
+
         endforeach;
+
     endif;
 
     $response = $query->get()->respond();
 
     foreach($response['wallet'] as $i => $point) :
+
         $response['wallet'][$i]->meta_data = maybe_unserialize($point->meta_data);
+
     endforeach;
 
     return wp_parse_args($response,[
@@ -372,6 +419,7 @@ function sejoli_get_all_request_fund(array $args, $table = array()) {
         'points'   => NULL,
         'messages' => []
     ]);
+
 }
 
 /**
@@ -418,11 +466,13 @@ function sejoli_request_wallet_fund(array $args) {
             if(false !== $response['valid']) :
                 do_action('sejoli/notification/wallet/request-fund', $response['wallet']);
             endif;
+
         endif;
 
     endif;
 
     return $response;
+
 }
 
 /**
@@ -439,6 +489,7 @@ function sejoli_get_wallet_detail($request_id) {
                     ->respond();
 
     return $response;
+
 }
 
 /**
@@ -463,6 +514,7 @@ function sejoli_update_request_fund(array $args) {
                     ->respond();
 
     return $response;
+
 }
 
 /**
@@ -474,6 +526,7 @@ function sejoli_update_request_fund(array $args) {
 function sejoli_manual_input_wallet( $args ) {
 
     if( ! current_user_can('manage_sejoli_sejoli') ) :
+
         return array(
             'valid' => false,
             'messages'  => array(
@@ -511,4 +564,5 @@ function sejoli_manual_input_wallet( $args ) {
         'wallet'   => NULL,
         'messages' => array()
     ));
+
 }

@@ -72,6 +72,13 @@ class Order {
 	protected $cashback_setup = false;
 
 	/**
+	 * Set cashback amount
+	 * @since	1.0.0
+	 * @var 	array|false
+	 */
+	protected $cashback = 0.0;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -81,7 +88,7 @@ class Order {
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
-		$this->version = $version;
+		$this->version     = $version;
 
 	}
 
@@ -117,10 +124,10 @@ class Order {
 				$this->order_use_wallet = true;
 			endif;
 
-
 		endif;
 
 		return $total;
+	
 	}
 
 	/**
@@ -151,6 +158,7 @@ class Order {
         endif;
 
 		return $total;
+	
 	}
 
 	/**
@@ -163,10 +171,13 @@ class Order {
 	public function add_cart_detail($detail, $post_data) {
 
 		if($this->order_use_wallet) :
+	
 			$detail['wallet'] = $this->wallet_amount;
+	
 		endif;
 
 		return $detail;
+	
 	}
 
 	/**
@@ -180,14 +191,19 @@ class Order {
 	public function set_order_meta_data(array $meta_data, array $order_data) {
 
 		if($this->cashback_setup) :
+	
 			$meta_data['cashback']	= $this->cashback_setup;
+	
 		endif;
 
 		if($this->order_use_wallet) :
+	
 			$meta_data['wallet'] = $this->wallet_amount;
+	
 		endif;
 
 		return $meta_data;
+	
 	}
 
 	/**
@@ -214,6 +230,7 @@ class Order {
 					$response['valid']
 				)
 			);
+	
 		endif;
 
 	}
@@ -257,6 +274,7 @@ class Order {
 			);
 
 		endif;
+    
     }
 
     /**
@@ -270,7 +288,9 @@ class Order {
      * @return void
      */
     public function update_point_status_to_not_valid(array $order_data) {
+    
         sejoli_update_wallet_valid_point($order_data['ID'], false);
+    
     }
 
     /**
@@ -280,7 +300,9 @@ class Order {
      * @return void
      */
     public function update_point_status_to_valid(array $order_data) {
+    
         sejoli_update_wallet_valid_point($order_data['ID'], true);
+    
     }
 
     /**
@@ -329,6 +351,7 @@ class Order {
                 false !== $single_response['valid'] &&
                 false !== $all_response['valid']
             ) :
+    
                 $info_content = str_replace('{{cashback}}',     sejolisa_price_format($single_response['wallet']->value), $info_content);
                 $info_content = str_replace('{{wallet-total}}', sejolisa_price_format($all_response['wallet']->available_total), $info_content);
 
@@ -339,5 +362,6 @@ class Order {
         endif;
 
         return $content;
+    
     }
 }
