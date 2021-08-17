@@ -141,7 +141,7 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
                                 ->respond();
 
             if(false !== $use_response['valid']) :
-                
+
                 $valid = true;
                 $messages['success'] = array(
                     sprintf(
@@ -149,15 +149,15 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
                         sejolisa_price_format($amount)
                     )
                 );
-            
+
             else :
-            
+
                 $messages = $use_response['messages'];
-            
+
             endif;
-       
+
         else :
-       
+
             $messages['error'] = array(
                 sprintf(
                     __('Jumlah yang anda gunakan sebesar %s melebihi saldo yang tersedia yaitu %s', 'sejoli'),
@@ -165,13 +165,13 @@ function sejoli_use_wallet($amount, $user_id = 0, $order_id = 0, $label = 'order
                     sejolisa_price_format($wallet->available_total)
                 )
             );
-       
+
         endif;
-    
+
     else :
-    
+
         $messages = $wallet_response['messages'];
-    
+
     endif;
 
     return array(
@@ -197,9 +197,9 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     $current_user_id = get_current_user_id();
 
     if(0 !== $user_id) :
-        
+
         wp_set_current_user($user_id);
-    
+
     endif;
 
     $setup          = 'product';
@@ -208,7 +208,7 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     $product        = sejolisa_get_product($order['product_id'], true);
     $user_group     = sejolisa_get_user_group($order['user_id']);
     $buyer_group    = (isset($user_group['name'])) ? $user_group['name'] : '-';
-    $quantity       = (isset($order['quantity'])) ? $order['quantity'] : '1';
+    $quantity       = (isset($order['quantity'])) ? absint($order['quantity']) : 1;
 
     if($product->cashback['activate']) :
 
@@ -226,9 +226,9 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
             0 < $product->cashback['max'] &&
             $total_cashback > $product->cashback['max']
         ) :
-    
+
             $total_cashback = $product->cashback['max'];
-    
+
         endif;
 
         $setup      = $product->cashback['setup'];
@@ -237,9 +237,9 @@ function sejoli_calculate_cashback(array $order, $user_id = 0) {
     endif;
 
     if(0 !== $user_id) :
-    
+
         wp_set_current_user($current_user_id);
-    
+
     endif;
 
     return array(
