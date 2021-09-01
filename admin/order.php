@@ -108,11 +108,12 @@ class Order {
 			if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
 				$subtotal = $total - floatval($wallet_data['wallet']->available_total);
+				$total_use_wallet = $total;
 
 				if($subtotal < 0) :
 
 					$total = 0.0;
-					$this->wallet_amount = $total;
+					$this->wallet_amount = $total_use_wallet;
 
 				else :
 
@@ -171,7 +172,7 @@ class Order {
 	public function add_cart_detail($detail, $post_data) {
 
 		if($this->order_use_wallet) :
-	
+			
 			$detail['wallet'] = $this->wallet_amount;
 	
 		endif;
