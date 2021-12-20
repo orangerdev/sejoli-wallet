@@ -268,7 +268,7 @@ class Order {
 				'add-cashback',
 				sprintf(
 					__('Add cashback %s from order ID %s for user %s', 'sejoli-reward'),
-					sejolisa_price_format($this->cashback['total']),
+					(isset($this->cashback['total'])) ? sejolisa_price_format($this->cashback['total']) : null,
 					$order_data['ID'],
 					$order_data['user_id']
 				)
