@@ -241,6 +241,10 @@ class Json extends \SejoliSA\JSON {
                         'user_id'      => $_data->user_id,
                         'display_name' => $_data->display_name,
                         'user_email'   => $_data->user_email,
+                        'detail_url'   => add_query_arg(array(
+                                            'page'    => 'sejoli-wallet',
+											'user_id' => $_data->user_id
+                                        ), admin_url('admin.php')),
                         'value'        => sejolisa_price_format($_data->value),
                         'meta_data'    => maybe_unserialize($_data->meta_data)
                     );
@@ -332,4 +336,62 @@ class Json extends \SejoliSA\JSON {
 		echo wp_send_json($response);
 		exit;
 	}
+
+	/**
+     * Prepare for exporting order data
+     * Hooked via wp_ajax_sejoli-request-wallet-export-prepare, priority 1
+     * @since   1.0.2
+     * @return  void
+     */
+    public function prepare_for_exporting() {
+
+        $response = [
+            'url'  => admin_url('/'),
+            'data' => [],
+        ];
+
+        $post_data = wp_parse_args($_POST,[
+            'data'    => array(),
+            'nonce'   => NULL,
+            'backend' => false
+        ]);
+
+        if( wp_verify_nonce( $post_data['nonce'], 'sejoli-request-wallet-export-prepare' ) ) :
+
+            $request = array();
+
+            foreach( $post_data['data'] as $_data ) :
+                
+                if( !empty( $_data['val'] ) ) :
+                    
+                    $request[$_data['name']] = $_data['val'];
+
+                endif;
+
+            endforeach;
+
+            if( false !== $post_data['backend'] ) :
+   
+                $request['backend'] = true;
+
+            endif;
+
+            $response['data'] = $request;
+            $response['url']  = wp_nonce_url(
+                                    add_query_arg(
+                                        $request,
+                                        site_url('/sejoli-ajax/sejoli-wallet-export')
+                                    ),
+                                    'sejoli-wallet-export',
+                                    'sejoli-nonce'
+                                );
+
+        endif;
+
+        echo wp_send_json( $response );
+        
+        exit;
+    
+    }
+
 }

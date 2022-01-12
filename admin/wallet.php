@@ -95,6 +95,12 @@ class Wallet {
 				),
 				'nonce'   => wp_create_nonce('sejoli-update-request-fund')
 			),
+			'export_prepare'   =>  array(
+				'ajaxurl' => add_query_arg(array(
+					'action' => 'sejoli-request-wallet-export-prepare'
+				), admin_url('admin-ajax.php')),
+				'nonce' => wp_create_nonce('sejoli-request-wallet-export-prepare')
+			),
 		);
 
 		return $js_vars;
@@ -269,4 +275,101 @@ class Wallet {
 		echo wp_send_json($response);
 		exit;
 	}
+
+	/**
+	 * Export order data to CSV
+	 * Hooked via action sejoli_ajax_sejoli-wallet-export, priority 1
+	 * @since 	1.1.0
+	 * @since 	1.5.3 	Add more information data to CSV
+	 * @return 	void
+	 */
+	public function export_csv() {
+
+		$post_data = wp_parse_args($_GET,[
+			'sejoli-nonce' => NULL,
+			'backend'      => false
+		]);
+
+		if( wp_verify_nonce( $post_data['sejoli-nonce'], 'sejoli-wallet-export') ) :
+
+			$filename = 'export-pencairan-dana-' . strtoupper( sanitize_title( get_bloginfo('name') ) ) . '-' . date( 'Y-m-d-H-i-s', current_time('timestamp') );
+
+			if( !current_user_can('manage_sejoli_sejoli') || false === $post_data['backend'] ) :
+				
+				$post_data['user_id'] = get_current_user_id();
+
+			endif;
+
+			if( isset( $post_data['user_id'] ) ) :
+
+				$filename .= '-'. $post_data['user_id'];
+
+			endif;
+
+			unset( $post_data['backend'], $post_data['sejoli-nonce'] );
+
+			$response = sejoli_get_all_request_fund( $post_data );
+
+			$csv_data    = [];
+			$csv_data[0] = array(
+				'created_at', 'name', 'email', 'value', 'note', 'accepted',
+			);
+
+			$j    = 1;
+			$data = [];
+			
+			foreach( $response['wallet'] as $i => $_data ) :
+
+                $data[$i] = array(
+					'id'           => $_data->ID,
+					'created_at'   => date( 'Y/m/d', strtotime( $_data->created_at ) ),
+                    'user_id'      => $_data->user_id,
+                    'display_name' => $_data->display_name,
+                    'user_email'   => $_data->user_email,
+                    'value'        => sejolisa_price_format( $_data->value ),
+                    'meta_data'    => maybe_unserialize( $_data->meta_data )
+                );
+
+                if( array_key_exists( 'note', $data[$i]['meta_data'] ) ) :
+
+					$data[$i]['meta_data']['note'] = nl2br( $data[$i]['meta_data']['note'] );
+
+				endif;
+
+				if( array_key_exists( 'accepted', $data[$i]['meta_data'] ) ) :
+
+					$data[$i]['meta_data']['accepted'] = date( 'd F Y', strtotime( $data[$i]['meta_data']['accepted'] ) );
+		
+				endif;
+
+				$csv_data[$j] = array(
+					$data[$i]['created_at'],
+					$data[$i]['display_name'],
+					$data[$i]['user_email'],
+					$data[$i]['value'],
+					$data[$i]['meta_data']['note'],
+					( isset( $data[$i]['meta_data']['accepted'] ) ? $data[$i]['meta_data']['accepted'] : '' )
+				);
+
+				$j++;
+
+			endforeach;
+
+			header( 'Content-Type: text/csv' );
+			header( 'Content-Disposition: attachment; filename="' . $filename . '.csv"' );
+
+			$fp = fopen( 'php://output', 'wb' );
+			foreach( $csv_data as $line ) :
+			    
+			    fputcsv( $fp, $line, ',' );
+
+			endforeach;
+			fclose( $fp );
+
+		endif;
+
+		exit;
+
+	}
+	
 }

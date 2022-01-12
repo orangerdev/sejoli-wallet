@@ -184,6 +184,37 @@ let sejoli_table;
 
             return false;
         });
+
+        /**
+         * Do export csv
+         */
+        $(document).on('click', '.export-csv', function() {
+
+            sejoli.helper.filterData();
+
+            $.ajax({
+                url      : sejoli_admin.wallet.export_prepare.ajaxurl,
+                type     : 'POST',
+                dataType : 'json',
+                data     : {
+                    action  : 'sejoli-request-wallet-export-prepare',
+                    nonce   : sejoli_admin.wallet.export_prepare.nonce,
+                    data    : sejoli.var.search,
+                    backend : 1
+                },
+                beforeSend : function() {
+                    sejoli.helper.blockUI('.sejoli-table-holder');
+                },
+                success : function( response ) {
+                    sejoli.helper.unblockUI('.sejoli-table-holder');
+                    window.location.href = response.url.replace(/&amp;/g, '&');
+                }
+            });
+
+            return false;
+
+        });
+        
     });
 })(jQuery);
 </script>
@@ -196,9 +227,11 @@ let sejoli_table;
 <script id='request-action' type="text/x-jsrender">
 <div class='button-holder'>
     {{if accepted }}
-    <span class="ui small green label">
+    <span class="ui small green label" style="float: left;">
         <i class="checkmark icon"></i> {{:accepted}}
     </span>
+    <button class="ui small label blue request-information" style="margin: 0; cursor: pointer;"><i class="info icon" style="margin: 0;"></i></button>
+    <div class='detail-request-information' style='display:none'>{{:note}}</div>
     {{else}}
     <div class="ui icon buttons">
         <button class="ui button small red confirm-request" data-request='{{:id}}' data-type='reject'><i class="close icon"></i></button>
