@@ -223,6 +223,7 @@ class Sejoli_Wallet {
 		$this->loader->add_action( 'wp_ajax_sejoli-request-fund-table',		$json, 'ajax_set_request_fund_for_table', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-update-request',			$json, 'ajax_update_request_status', 1);
 		$this->loader->add_action( 'sejoli_ajax_single-wallet-table',		$json, 'ajax_set_single_user_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-request-wallet-export-prepare',	$json, 'prepare_for_exporting', 1);
 
 		$notification = new Sejoli_Wallet\Admin\Notification( $this->get_plugin_name(), $this->get_version() );
 
@@ -271,6 +272,7 @@ class Sejoli_Wallet {
 		$this->loader->add_filter( 'sejoli/admin/is-sejoli-page', 			$wallet, 'is_current_page_sejoli_page', 1111);
 		$this->loader->add_filter( 'sejoli/admin/js-localize-data',			$wallet, 'set_localize_js_vars', 11);
 		$this->loader->add_action( 'admin_menu',							$wallet, 'add_sejoli_submenu', 1002);
+		$this->loader->add_action( 'sejoli_ajax_sejoli-wallet-export',		$wallet, 'export_csv', 1);
 	}
 
 	/**
