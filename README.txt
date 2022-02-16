@@ -4,7 +4,7 @@ Donate link: https://ridwan-arifandi.com
 Tags: membership, wallet, point, cashback
 Requires at least: 5.4.1
 Tested up to: 5.8.0
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.1.4 =
+Fix error when showing unmatched number
+Fix error notice
+Fix export csv data
 
 = 1.1.3 =
 Fix wrong cashback calculation
