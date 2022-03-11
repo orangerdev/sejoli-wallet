@@ -6,13 +6,21 @@
     if(false !== $wallet_response['valid']) :
         $amount = $wallet_response['wallet']->available_cash;
     endif;
+
+    $currency_type = carbon_get_theme_option('sejoli_currency_type');
+
+    if( $currency_type === "IDR" ) {
+        $currency = 'Rp. ';
+    } elseif( $currency_type === "MYR" ) {
+        $currency = 'RM. ';
+    }
 ?>
 <h2 class="ui header"><?php _e('Pencairan Dana', 'sejoli'); ?></h2>
 <form id='sejoli-request-fund' method="post" class="ui form">
     <div class="field">
         <label><?php _e('Total Pencairan', 'sejoli'); ?></label>
         <div class="ui right labeled input">
-            <label for="amount" class="ui label">Rp. </label>
+            <label for="amount" class="ui label"><?php echo $currency; ?> </label>
             <input type="number" placeholder="" id="amount" value='<?php echo $amount; ?>' name='amount' required />
         </div>
     </div>
