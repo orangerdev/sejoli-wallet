@@ -253,7 +253,7 @@ class Order {
 				'order_id'    => $order_data['ID'],
 				'product_id'  => $this->product->ID,
 				'user_id'     => $order_data['user_id'],
-				'value'       => $order_data['quantity'] * $this->cashback_setup['total'],
+				'value'       => $this->cashback_setup['total'],
 				'refundable'  => $this->cashback_setup['refundable'],
 				'label'       => 'cashback',
 				'valid_point' => ('completed' !== $order_data['status']) ? false : true,
