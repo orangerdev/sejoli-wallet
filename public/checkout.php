@@ -1,7 +1,5 @@
 <?php
-
 namespace Sejoli_Wallet\Front;
-
 
 class Checkout {
 
@@ -64,17 +62,30 @@ class Checkout {
 
 		if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
-			$this->product = $product;
-
+			$this->product 		 = $product;
 			$this->enable_wallet = true;
-			$wallet = $wallet_data['wallet'];
 
-			if('digital' === $product->type) :
-				require_once( plugin_dir_path( __FILE__ ) . '/partials/digital/wallet-field.php');
-	        else :
-				require_once( plugin_dir_path( __FILE__ ) . '/partials/physical/wallet-field.php');
-	        endif;
+			$wallet 					= $wallet_data['wallet'];
+			$disable_wallet 			= boolval(carbon_get_post_meta($product->ID, 'deactivate_wallet'));
+			$available_payment_gateways = apply_filters('sejoli/payment/available-payment-gateways', []);
+			$payment_options 			= sejolisa_get_payment_options();
+
+			if(false === $disable_wallet && count($payment_options) === 0) :
+
+				if('digital' === $product->type) :
+				
+					require_once( plugin_dir_path( __FILE__ ) . '/partials/digital/wallet-field.php');
+		        
+		        else :
+				
+					require_once( plugin_dir_path( __FILE__ ) . '/partials/physical/wallet-field.php');
+		        
+		        endif;
+		    
+		    endif;
+		
 		endif;
+
 	}
 
     /**

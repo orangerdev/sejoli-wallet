@@ -257,6 +257,7 @@ class Sejoli_Wallet {
 		$product = new Sejoli_Wallet\Admin\Product( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_filter( 'sejoli/product/fields',					$product, 'set_product_fields', 	11);
+		$this->loader->add_filter( 'sejoli/product/fields',					$product, 'set_product_wallet_fields', 	11);
 		$this->loader->add_filter( 'sejoli/user-group/fields',				$product, 'set_user_group_fields',	11);
 		$this->loader->add_filter( 'sejoli/user-group/per-product/fields',	$product, 'set_user_group_per_product_fields',  11);
 		$this->loader->add_filter( 'sejoli/product/meta-data',				$product, 'set_product_cashback',	122);
