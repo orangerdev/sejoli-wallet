@@ -345,53 +345,179 @@ class Json extends \SejoliSA\JSON {
      */
     public function prepare_for_exporting() {
 
-        $response = [
-            'url'  => admin_url('/'),
-            'data' => [],
-        ];
+        $table  = \SEJOLI_WALLET\Model\Wallet::set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce' => NULL
+        ));
 
-        $post_data = wp_parse_args($_POST,[
-            'data'    => array(),
-            'nonce'   => NULL,
-            'backend' => false
-        ]);
+        if(
+            wp_verify_nonce( $_POST['nonce'], 'sejoli-request-wallet-export-prepare') ) :
 
-        if( wp_verify_nonce( $post_data['nonce'], 'sejoli-request-wallet-export-prepare' ) ) :
+            $wallet_data = sejoli_get_all_user_wallet($table['filter']);
 
-            $request = array();
+            if( !is_wp_error( $wallet_data )) :
 
-            foreach( $post_data['data'] as $_data ) :
-                
-                if( !empty( $_data['val'] ) ) :
-                    
-                    $request[$_data['name']] = $_data['val'];
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment; filename="sejoli-wallet-per-'.date('d-m-Y').'.csv"');
 
-                endif;
+                $fp = fopen('php://output', 'wb');
 
-            endforeach;
+                fputcsv( $fp, array(
+                    'user_id',
+                    'name',
+                    'email',
+                    'cash',
+                    'point',
+                    'used',
+                    'available_cash',
+                    'available_total'
+                ));
 
-            if( false !== $post_data['backend'] ) :
-   
-                $request['backend'] = true;
+                foreach($wallet_data['wallet'] as $_data) :
+
+                    fputcsv( $fp, array(
+                        $_data->user_id,
+                        $_data->display_name,
+                        $_data->user_email,
+                        $_data->cash_value,
+                        $_data->point_value,
+                        $_data->used_value,
+                        $_data->available_cash,
+                        $_data->available_total
+                    ));
+
+                endforeach;
+
+                fclose($fp);
+
+            else :
+
+                wp_send_json_error( $wallet_data );
 
             endif;
 
-            $response['data'] = $request;
-            $response['url']  = wp_nonce_url(
-                                    add_query_arg(
-                                        $request,
-                                        site_url('/sejoli-ajax/sejoli-wallet-export')
-                                    ),
-                                    'sejoli-wallet-export',
-                                    'sejoli-nonce'
-                                );
+        endif;
+
+        exit;
+    
+    }
+
+    /**
+     * Set wallet label detail
+     * @since   1.0.0
+     * @param   object  $wallet_data        Single wallet data
+     * @return  string
+     */
+    public function set_wallet_label_detail( object $wallet_data ) {
+
+        $detail = '';
+
+        switch($wallet_data->label) :
+
+            case 'cashback' :
+                $product = sejolisa_get_product($wallet_data->product_id);
+                $detail  = sprintf(
+                                __('Cashback dari order %s untuk produk %s', 'sejoli'),
+                                $wallet_data->order_id,
+                                $product->post_title
+                           );
+                break;
+
+            case 'affiliate' :
+                $product = sejolisa_get_product($wallet_data->product_id);
+                $detail  = sprintf(
+                                __('Poin dari affiliasi order %s untuk produk %s, tier %s', 'sejoli'),
+                                $wallet_data->order_id,
+                                $product->post_title,
+                                $wallet_data->meta_data['tier']
+                            );
+                break;
+
+            case 'order' :
+
+                $detail = sprintf(
+                            __('Pembayaran untuk order %s', 'sejoli'),
+                            $wallet_data->order_id
+                          );
+                break;
+
+            case 'request' :
+
+                $detail = __('Request pencairan', 'sejoli');
+                break;
+
+            case 'manual'   :
+
+                $detail = $wallet_data->meta_data['note'] . ' ' . $wallet_data->meta_data['input'];
+                break;
+
+        endswitch;
+
+        return apply_filters( 'sejoli/wallet/note', $detail, $wallet_data);
+
+    }
+
+    /**
+     * Create csv file for a single user
+     * Hooked via action wp_ajax_sejoli-request-wallet-export-single-prepare, priority 1
+     * @return  file|json
+     */
+    public function prepare_for_exporting_for_single() {
+
+        $table  = \SEJOLI_WALLET\Model\Wallet::set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce'   => NULL,
+            'user_id' => NULL
+        ));
+
+        $data = [];
+
+        if(wp_verify_nonce($params['nonce'], 'sejoli-request-wallet-export-single-prepare')) :
+
+            $table['filter']['user_id'] = (empty($params['user_id'])) ? get_current_user_id() : intval($params['user_id']);
+
+            $table['length'] = 0;
+
+            $return = sejoli_wallet_get_history($table['filter'], $table);
+
+            if(false !== $return['valid']) :
+
+                $user = sejolisa_get_user($params['user_id']);
+                $name = strtoupper( sanitize_title( $user->data->display_name ) );
+
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment; filename="sejowoo-wallet-by-user-' . $name . '-' . date('d-m-Y') . '.csv"');
+
+                $fp = fopen('php://output', 'wb');
+
+                fputcsv( $fp, array(
+                    'date',
+                    'detail',
+                    'point',
+                    'type',
+                    'refundable',
+                ));
+
+                foreach($return['wallet'] as $_data) :
+
+                    fputcsv( $fp, array(
+                        date('Y/m/d', strtotime($_data->created_at)),
+                        $this->set_wallet_label_detail($_data),
+                        $_data->value,
+                        $_data->type,
+                        (true === boolval($_data->refundable) ) ? 'Y' : 'N'
+                    ));
+
+                endforeach;
+
+                fclose($fp);
+
+            endif;
 
         endif;
 
-        echo wp_send_json( $response );
-        
-        exit;
-    
+        exit;         
+
     }
 
 }

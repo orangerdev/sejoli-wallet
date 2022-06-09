@@ -95,11 +95,17 @@ class Wallet {
 				),
 				'nonce'   => wp_create_nonce('sejoli-update-request-fund')
 			),
-			'export_prepare'   =>  array(
+			'export_prepare' =>  array(
 				'ajaxurl' => add_query_arg(array(
 					'action' => 'sejoli-request-wallet-export-prepare'
 				), admin_url('admin-ajax.php')),
 				'nonce' => wp_create_nonce('sejoli-request-wallet-export-prepare')
+			),
+			'export_single_prepare' =>  array(
+				'ajaxurl' => add_query_arg(array(
+					'action' => 'sejoli-request-wallet-export-single-prepare'
+				), admin_url('admin-ajax.php')),
+				'nonce' => wp_create_nonce('sejoli-request-wallet-export-single-prepare')
 			),
 		);
 
