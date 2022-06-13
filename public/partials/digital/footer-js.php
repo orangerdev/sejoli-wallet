@@ -12,6 +12,5 @@
             sejoliSaCheckout.getCalculate();
         });
     });
-
 })(jQuery);
 </script>

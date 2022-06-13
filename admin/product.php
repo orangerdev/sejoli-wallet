@@ -107,6 +107,31 @@ class Product {
         return $fields;
     }
 
+    /**
+     * Add cashback setup in product fields
+     * Hooked via filter sejoli/product/fields, priority 10
+     * @since   1.0.0
+     * @param   array   $fields
+     * @return  array
+     */
+    public function set_product_wallet_fields($fields) {
+
+        $fields[]   = array(
+            'title'     => __('Wallet', 'sejoli'),
+            'fields'    => array(
+                Field::make('separator', 'sep_wallet_option', __('Pengaturan Wallet', 'sejoli'))
+                    ->set_classes('sejoli-with-help'),
+
+				Field::make('checkbox',	'deactivate_wallet', __('Non Aktifkan Wallet', 'sejoli'))
+				->set_help_text(
+                    __('Non aktifkan wallet untuk produk ini.', 'sejoli')
+                ),
+            )
+        );
+
+        return $fields;
+    }
+
 	/**
 	 * Add cashback setting in each product setup in user group fields
 	 * Hooked via filter sejoli/user-group/fields, priority 11

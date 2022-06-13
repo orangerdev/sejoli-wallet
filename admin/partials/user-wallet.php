@@ -152,6 +152,16 @@ let sejoli_table;
             $('.sejoli-form-filter-holder').hide();
         });
 
+        $(document).on('click', '.export-csv', function(){
+            sejoli.helper.filterData();
+            
+            $('<form action="' + sejoli_admin.wallet.export_prepare.ajaxurl + '" method="POST">')
+                .append($('<input />').attr('type', 'hidden').attr('name', 'filter').val(sejoli.var.search))
+                .append($('<input />').attr('type', 'hidden').attr('name', 'nonce').val(sejoli_admin.wallet.export_prepare.nonce))
+                .appendTo($(document.body))
+                .submit()
+        });
+
     });
 })(jQuery);
 </script>
