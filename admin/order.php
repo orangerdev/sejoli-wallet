@@ -107,6 +107,18 @@ class Order {
 
 			if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
+				if(isset($post_data['shipment']) && !empty($post_data['shipment']) && 'undefined' !== $post_data['shipment']) {
+					list($courier,$service,$cost) = explode(':::', $post_data['shipment']);
+					$total += $cost;
+				}
+
+				if(isset($post_data['coupon']) && !empty($post_data['coupon']) && 'undefined' !== $post_data['coupon']) {
+					$get_coupon = sejolisa_get_coupon_by_code($post_data['coupon']);
+					$total = $total - $get_coupon['coupon']['discount']['value'];
+				} else {
+					$get_coupon = '';
+				}
+
 				$subtotal = $total - floatval($wallet_data['wallet']->available_total);
 				$total_use_wallet = $total;
 
@@ -126,7 +138,7 @@ class Order {
 			endif;
 
 		endif;
-
+		
 		return $total;
 	
 	}
@@ -217,6 +229,17 @@ class Order {
 	public function add_wallet_use(array $order_data) {
 
 		if(false !== $this->order_use_wallet) :
+
+			// $order_data['payment_info'] = null;
+			// $order_data['payment_gateway'] = "e-wallet";
+
+			// $used_module = $order_data['payment_gateway'];
+
+			// if( isset($this->libraries[$used_module]) ) :
+
+			// 	$order_data['payment_info'] = $this->libraries[$used_module]->set_payment_info($order_data);
+
+			// endif;
 
 			$response = sejoli_use_wallet($this->wallet_amount, $order_data['user_id'], $order_data['ID']);
 
