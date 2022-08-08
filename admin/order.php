@@ -228,21 +228,18 @@ class Order {
 	 */
 	public function add_wallet_use(array $order_data) {
 
+		if( $order_data['type'] === 'subscription-regular' && $order_data['order_parent_id']  > 0 ) :
+
+			if($order_data['meta_data']['coupon']['discount'] > 0) {
+				$this->wallet_amount = $this->wallet_amount - $order_data['meta_data']['coupon']['discount'];
+			}
+		
+		endif;
+
 		if(false !== $this->order_use_wallet) :
 
-			// $order_data['payment_info'] = null;
-			// $order_data['payment_gateway'] = "e-wallet";
-
-			// $used_module = $order_data['payment_gateway'];
-
-			// if( isset($this->libraries[$used_module]) ) :
-
-			// 	$order_data['payment_info'] = $this->libraries[$used_module]->set_payment_info($order_data);
-
-			// endif;
-
 			$response = sejoli_use_wallet($this->wallet_amount, $order_data['user_id'], $order_data['ID']);
-
+	
 			do_action(
 				'sejoli/log/write',
 				'use-wallet',
