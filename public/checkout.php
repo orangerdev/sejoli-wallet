@@ -70,24 +70,43 @@ class Checkout {
 			$using_wallet_only 			= boolval(carbon_get_post_meta($product->ID, 'buy_using_wallet_only'));
 			// $available_payment_gateways = apply_filters('sejoli/payment/available-payment-gateways', []);
 			// $payment_options 			= sejolisa_get_payment_options();
+			
+			if( sejolisa_verify_checkout_page('renew') && $this->enable_wallet ) :
 
-            $request = wp_parse_args( $_POST,[
-                'product_id'      => 0,
-                'coupon'          => NULL,
-                'quantity'        => 1,
-                'type'            => 'regular',
-                'payment_gateway' => 'manual',
-                'shipment'        => NULL,
-                'variants'        => [],
-				'wallet'		  => false,
-            ]);
-            $response = [];
-            $request['product_id'] = $product->ID;
-            do_action('sejoli/frontend/checkout/calculate', $request);
-            $response['calculate'] = sejolisa_get_respond('total');
+            	$request = wp_parse_args( $_POST,[
+					'order_id'		  => $_GET['order_id'],
+	                'product_id'      => NULL,
+	                'coupon'          => NULL,
+	                'quantity'        => 1,
+	                'type'            => 'regular',
+	                'payment_gateway' => 'manual',
+	                'shipment'        => NULL,
+	                'variants'        => [],
+	                // 'wallet'		  => false,
+	            ]);
+	            $response = [];
+	            $request['product_id'] = $product->ID;
+	            do_action('sejoli/checkout/calculate-renew', $request);
+	            $response['calculate'] = sejolisa_get_respond('total');
 
-			// do_action('sejoli/checkout/calculate', $request);
-			// $response['calculate'] = sejolisa_get_respond('total');
+			else:
+
+	            $request = wp_parse_args( $_POST,[
+	                'product_id'      => 0,
+	                'coupon'          => NULL,
+	                'quantity'        => 1,
+	                'type'            => 'regular',
+	                'payment_gateway' => 'manual',
+	                'shipment'        => NULL,
+	                'variants'        => [],
+					'wallet'		  => false,
+	            ]);
+	            $response = [];
+	            $request['product_id'] = $product->ID;
+	            do_action('sejoli/frontend/checkout/calculate', $request);
+	            $response['calculate'] = sejolisa_get_respond('total');
+
+	        endif;
 
 			if(false === $disable_wallet && true === $using_wallet_only) :
 
@@ -139,7 +158,7 @@ class Checkout {
 	 */
 	public function add_js_script() {
 
-		if(is_singular('sejoli-product') && $this->enable_wallet) :
+		if( is_singular('sejoli-product') && $this->enable_wallet ) :
 
 			$disable_wallet    = boolval(carbon_get_post_meta($this->product->ID, 'deactivate_wallet'));
             $using_wallet_only = boolval(carbon_get_post_meta($this->product->ID, 'buy_using_wallet_only'));
@@ -150,6 +169,17 @@ class Checkout {
 				else :
 					require_once( plugin_dir_path( __FILE__ ) . 'partials/physical/footer-js.php');
 				endif;
+			endif;
+
+		endif;
+
+		if( sejolisa_verify_checkout_page('renew') && $this->enable_wallet ) :
+
+			$disable_wallet    = boolval(carbon_get_post_meta($this->product->ID, 'deactivate_wallet'));
+            $using_wallet_only = boolval(carbon_get_post_meta($this->product->ID, 'buy_using_wallet_only'));
+            
+            if(false === $disable_wallet && true === $using_wallet_only) :
+				require_once( plugin_dir_path( __FILE__ ) . 'partials/digital/footer-renew-js.php');
 			endif;
 
 		endif;
