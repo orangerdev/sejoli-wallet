@@ -10,6 +10,7 @@
         if( hasil > 0 ) {
             $('#use-wallet').show();
             setTimeout(() => {
+                $('#use-wallet').trigger('click');
                 $('.beli-sekarang .submit-button').text('<?php echo __('PROSES SEKARANG', 'sejoli-wallet'); ?>');
             }, 2000)
         } else {
