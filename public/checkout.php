@@ -68,8 +68,6 @@ class Checkout {
 			$wallet 					= $wallet_data['wallet'];
 			$disable_wallet 			= boolval(carbon_get_post_meta($product->ID, 'deactivate_wallet'));
 			$using_wallet_only 			= boolval(carbon_get_post_meta($product->ID, 'buy_using_wallet_only'));
-			// $available_payment_gateways = apply_filters('sejoli/payment/available-payment-gateways', []);
-			// $payment_options 			= sejolisa_get_payment_options();
 			
 			if( sejolisa_verify_checkout_page('renew') && $this->enable_wallet ) :
 
