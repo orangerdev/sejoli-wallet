@@ -14,13 +14,13 @@
                 $('.use-wallet').hide();
                 setTimeout(() => {
                     $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
-                }, 5000)
+                }, 1500)
             } else {
                 $('.use-wallet').show();
                 setTimeout(() => {
                     $('#use-wallet').trigger('click');
                     $('.beli-sekarang .submit-button').text('<?php echo __('PROSES SEKARANG', 'sejoli-wallet'); ?>');
-                }, 5000)
+                }, 1500)
             }
 
             $('.beli-sekarang .submit-button').attr('disabled','disabled');
@@ -54,7 +54,24 @@
 
         $('body').on('change', '#use-wallet', function(){
             sejoliSaCheckoutFisik.func.getCalculateAfterUseWallet();
-            $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
+            
+            var use_wallet = document.getElementsByName('use-wallet');
+
+            for (var i = 0, length = use_wallet.length; i < length; i++) {
+                if (use_wallet[i].checked) {
+                    setTimeout(() => {
+                        $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
+                    }, 1500);
+
+                    break;
+                } else {
+                    setTimeout(() => {
+                        $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                    }, 1500);
+
+                    break;
+                }
+            }
         });
     });
 })(jQuery);

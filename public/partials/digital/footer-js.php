@@ -56,6 +56,24 @@
 
         $('body').on('change', '#use-wallet', function(){
             sejoliSaCheckout.getCalculateAfterUseWallet();
+
+            var use_wallet = document.getElementsByName('use-wallet');
+
+            for (var i = 0, length = use_wallet.length; i < length; i++) {
+                if (use_wallet[i].checked) {
+                    setTimeout(() => {
+                        $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
+                    }, 1500);
+
+                    break;
+                } else {
+                    setTimeout(() => {
+                        $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                    }, 1500);
+
+                    break;
+                }
+            }
         });
     });
 })(jQuery);
