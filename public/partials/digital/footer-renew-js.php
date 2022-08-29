@@ -11,7 +11,7 @@
             $('#use-wallet').show();
             setTimeout(() => {
                 $('#use-wallet').trigger('click');
-                $('.beli-sekarang .submit-button').text('<?php echo __('PROSES SEKARANG', 'sejoli-wallet'); ?>');
+                $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
             }, 2000)
         } else {
             $('#use-wallet').hide();
@@ -46,7 +46,7 @@
 
                     if( hasil > 0 ) {
                         $('.use-wallet').show();
-                        $('.beli-sekarang .submit-button').text('<?php echo __('PROSES SEKARANG', 'sejoli-wallet'); ?>');
+                        $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
                         $('.beli-sekarang .submit-button').attr('disabled','disabled');
                     } else {
                         $('.use-wallet').hide();
