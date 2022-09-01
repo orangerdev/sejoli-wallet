@@ -107,6 +107,28 @@ class Order {
 
 			if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
+				if(isset($post_data['coupon']) && !empty($post_data['coupon']) && 'undefined' !== $post_data['coupon']) {
+					$get_coupon        = sejolisa_get_coupon_by_code($post_data['coupon']);
+					$get_discount_type = $get_coupon['coupon']['discount']['type'];
+
+					if('percentage' === $get_discount_type) :
+						$total = $total - ($total * $get_coupon['coupon']['discount']['value'] / 100);
+					else :
+						if('per_item' === $get_coupon['coupon']['discount']['usage']) :
+							$total = $total - ($post_data['quantity'] * $get_coupon['coupon']['discount']['value']);
+						else :
+							$total = $total - $get_coupon['coupon']['discount']['value'];
+						endif;
+					endif;
+				} else {
+					$get_coupon = '';
+				}
+
+				if(isset($post_data['shipment']) && !empty($post_data['shipment']) && 'undefined' !== $post_data['shipment']) {
+					list($courier,$service,$cost) = explode(':::', $post_data['shipment']);
+					$total += $cost;
+				}
+
 				$subtotal = $total - floatval($wallet_data['wallet']->available_total);
 				$total_use_wallet = $total;
 
@@ -126,7 +148,7 @@ class Order {
 			endif;
 
 		endif;
-
+		
 		return $total;
 	
 	}
@@ -216,10 +238,18 @@ class Order {
 	 */
 	public function add_wallet_use(array $order_data) {
 
+		if( $order_data['type'] === 'subscription-regular' && $order_data['order_parent_id']  > 0 ) :
+
+			if($order_data['meta_data']['coupon']['discount'] > 0) {
+				$this->wallet_amount = $this->wallet_amount - $order_data['meta_data']['coupon']['discount'];
+			}
+		
+		endif;
+
 		if(false !== $this->order_use_wallet) :
 
 			$response = sejoli_use_wallet($this->wallet_amount, $order_data['user_id'], $order_data['ID']);
-
+	
 			do_action(
 				'sejoli/log/write',
 				'use-wallet',

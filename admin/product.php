@@ -126,6 +126,24 @@ class Product {
 				->set_help_text(
                     __('Non aktifkan wallet untuk produk ini.', 'sejoli')
                 ),
+    // 			Field::make( 'radio', 'deactivate_wallet', __('Tipe Produk', 'sejoli'))
+				// ->set_options([
+				// 	'false'	=> __('Non Aktifkan Wallet' ,'sejoli'),
+				// 	'true'	=> __('Aktifkan Wallet', 'sejoli')
+				// ])
+				// ->set_default_value('false')
+				// ->set_width(50),
+                Field::make('checkbox',	'buy_using_wallet_only', __('Pembelian Hanya Menggunakan Dana Wallet', 'sejoli'))
+				->set_help_text(
+                    __('Buyer melakukan pembelian hanya menggunakan dana wallet untuk produk ini.', 'sejoli')
+                )
+                ->set_default_value(true)
+                ->set_conditional_logic(array(
+					array(
+						'field'	=> 'deactivate_wallet',
+						'value'	=> false
+					)
+				))
             )
         );
 

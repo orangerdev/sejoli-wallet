@@ -67,6 +67,7 @@ class Sejoli_Wallet {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
+		
 		if ( defined( 'SEJOLI_WALLET_VERSION' ) ) {
 			$this->version = SEJOLI_WALLET_VERSION;
 		} else {
