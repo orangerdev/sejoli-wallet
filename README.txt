@@ -4,7 +4,7 @@ Donate link: https://ridwan-arifandi.com
 Tags: membership, wallet, point, cashback
 Requires at least: 6.0.0
 Tested up to: 6.0.2
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.2.1
+Improve performance
 
 = 1.2.0
 Add bump sale feature integration
