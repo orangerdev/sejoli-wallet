@@ -197,27 +197,27 @@ class CancelRequestFund extends \SejoliSA\Notification\Main {
 		// Setup content for buyer
 		// ***********************
 
-		$this->set_recipient_title  ('buyer', 'email', carbon_get_theme_option('cancel_request_fund_email_title'));
+		$this->set_recipient_title  ('buyer', 'email', sejolisa_carbon_get_theme_option('cancel_request_fund_email_title'));
 		$this->set_recipient_content('buyer', 'email', $this->set_notification_content(
-												carbon_get_theme_option('cancel_request_fund_email_content'),
+												sejolisa_carbon_get_theme_option('cancel_request_fund_email_content'),
 												'email',
                                                 'buyer'
 											 ));
 
-		if(!empty(carbon_get_theme_option('cancel_request_fund_whatsapp_content'))) :
+		if(!empty(sejolisa_carbon_get_theme_option('cancel_request_fund_whatsapp_content'))) :
 
             $this->set_enable_send('whatsapp', 'buyer', true);
 			$this->set_recipient_content('buyer', 'whatsapp', $this->set_notification_content(
-		                                                carbon_get_theme_option('cancel_request_fund_whatsapp_content'),
+		                                                sejolisa_carbon_get_theme_option('cancel_request_fund_whatsapp_content'),
 		                                                'whatsapp',
                                                         'buyer'
                                                     ));
         endif;
 
-		if(!empty(carbon_get_theme_option('cancel_request_fund_sms_content'))) :
+		if(!empty(sejolisa_carbon_get_theme_option('cancel_request_fund_sms_content'))) :
             $this->set_enable_send('sms', 'buyer', true);
 			$this->set_recipient_content('buyer', 'sms', $this->set_notification_content(
-                                    				carbon_get_theme_option('cancel_request_fund_sms_content'),
+                                    				sejolisa_carbon_get_theme_option('cancel_request_fund_sms_content'),
                                     				'sms',
                                                     'buyer'
                                     			));
@@ -227,30 +227,30 @@ class CancelRequestFund extends \SejoliSA\Notification\Main {
 		// Setup content for buyer
 		// ***********************
 
-		if(false !== carbon_get_theme_option('cancel_request_fund_admin_active')) :
+		if(false !== sejolisa_carbon_get_theme_option('cancel_request_fund_admin_active')) :
 
             $this->set_enable_send('email', 'admin', true);
-    		$this->set_recipient_title('admin', 'email', carbon_get_theme_option('cancel_request_fund_admin_email_title'));
+    		$this->set_recipient_title('admin', 'email', sejolisa_carbon_get_theme_option('cancel_request_fund_admin_email_title'));
     		$this->set_recipient_content('admin', 'email', $this->set_notification_content(
-													carbon_get_theme_option('cancel_request_fund_admin_email_content'),
+													sejolisa_carbon_get_theme_option('cancel_request_fund_admin_email_content'),
 													'email',
                                                     'admin'
 												));
 
-    		if(!empty(carbon_get_theme_option('cancel_request_fund_admin_whatsapp_content'))) :
+    		if(!empty(sejolisa_carbon_get_theme_option('cancel_request_fund_admin_whatsapp_content'))) :
 
 				$this->set_enable_send('whatsapp', 'admin', true);
 				$this->set_recipient_content('admin', 'whatsapp', $this->set_notification_content(
-                                                			carbon_get_theme_option('cancel_request_fund_admin_whatsapp_content'),
+                                                			sejolisa_carbon_get_theme_option('cancel_request_fund_admin_whatsapp_content'),
                                                 			'whatsapp',
                                                             'admin'
                                                 		));
             endif;
 
-    		if(!empty(carbon_get_theme_option('cancel_request_fund_admin_sms_content'))) :
+    		if(!empty(sejolisa_carbon_get_theme_option('cancel_request_fund_admin_sms_content'))) :
                 $this->set_enable_send('sms', 'admin', true);
 				$this->set_recipient_content('admin', 'sms', $this->set_notification_content(
-                                        				carbon_get_theme_option('cancel_request_fund_admin_sms_content'),
+                                        				sejolisa_carbon_get_theme_option('cancel_request_fund_admin_sms_content'),
                                         				'sms',
                                                         'admin'
                                         			));
@@ -267,7 +267,7 @@ class CancelRequestFund extends \SejoliSA\Notification\Main {
      */
     protected function check_recipients($media = 'email', $role = 'admin') {
 
-        $recipients       = carbon_get_theme_option('cancel_request_fund_' . $role . '_' . $media . '_recipient');
+        $recipients       = sejolisa_carbon_get_theme_option('cancel_request_fund_' . $role . '_' . $media . '_recipient');
         $this->recipients = explode(',', $recipients);
     }
 

@@ -301,7 +301,7 @@ class Wallet {
 			$filename = 'export-pencairan-dana-' . strtoupper( sanitize_title( get_bloginfo('name') ) ) . '-' . date( 'Y-m-d-H-i-s', current_time('timestamp') );
 
 			if( !current_user_can('manage_sejoli_sejoli') || false === $post_data['backend'] ) :
-				
+
 				$post_data['user_id'] = get_current_user_id();
 
 			endif;
@@ -323,7 +323,7 @@ class Wallet {
 
 			$j    = 1;
 			$data = [];
-			
+
 			foreach( $response['wallet'] as $i => $_data ) :
 
                 $data[$i] = array(
@@ -345,7 +345,7 @@ class Wallet {
 				if( array_key_exists( 'accepted', $data[$i]['meta_data'] ) ) :
 
 					$data[$i]['meta_data']['accepted'] = date( 'd F Y', strtotime( $data[$i]['meta_data']['accepted'] ) );
-		
+
 				endif;
 
 				$csv_data[$j] = array(
@@ -366,7 +366,7 @@ class Wallet {
 
 			$fp = fopen( 'php://output', 'wb' );
 			foreach( $csv_data as $line ) :
-			    
+
 			    fputcsv( $fp, $line, ',' );
 
 			endforeach;
@@ -377,5 +377,5 @@ class Wallet {
 		exit;
 
 	}
-	
+
 }

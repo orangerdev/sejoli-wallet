@@ -66,8 +66,8 @@ class Checkout {
 			$this->enable_wallet = true;
 
 			$wallet 					= $wallet_data['wallet'];
-			$disable_wallet 			= boolval(carbon_get_post_meta($product->ID, 'deactivate_wallet'));
-			$using_wallet_only 			= boolval(carbon_get_post_meta($product->ID, 'buy_using_wallet_only'));
+			$disable_wallet 			= boolval(sejolisa_carbon_get_post_meta($product->ID, 'deactivate_wallet'));
+			$using_wallet_only 			= boolval(sejolisa_carbon_get_post_meta($product->ID, 'buy_using_wallet_only'));
 			
 			if( sejolisa_verify_checkout_page('renew') && $this->enable_wallet ) :
 
@@ -158,8 +158,8 @@ class Checkout {
 
 		if( is_singular('sejoli-product') && $this->enable_wallet ) :
 
-			$disable_wallet    = boolval(carbon_get_post_meta($this->product->ID, 'deactivate_wallet'));
-            $using_wallet_only = boolval(carbon_get_post_meta($this->product->ID, 'buy_using_wallet_only'));
+			$disable_wallet    = boolval(sejolisa_carbon_get_post_meta($this->product->ID, 'deactivate_wallet'));
+            $using_wallet_only = boolval(sejolisa_carbon_get_post_meta($this->product->ID, 'buy_using_wallet_only'));
 
             if(false === $disable_wallet && true === $using_wallet_only) :
 				if('digital' === $this->product->type) :
@@ -173,8 +173,8 @@ class Checkout {
 
 		if( sejolisa_verify_checkout_page('renew') && $this->enable_wallet ) :
 
-			$disable_wallet    = boolval(carbon_get_post_meta($this->product->ID, 'deactivate_wallet'));
-            $using_wallet_only = boolval(carbon_get_post_meta($this->product->ID, 'buy_using_wallet_only'));
+			$disable_wallet    = boolval(sejolisa_carbon_get_post_meta($this->product->ID, 'deactivate_wallet'));
+            $using_wallet_only = boolval(sejolisa_carbon_get_post_meta($this->product->ID, 'buy_using_wallet_only'));
             
             if(false === $disable_wallet && true === $using_wallet_only) :
 				require_once( plugin_dir_path( __FILE__ ) . 'partials/digital/footer-renew-js.php');

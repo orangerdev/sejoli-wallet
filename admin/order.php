@@ -356,15 +356,15 @@ class Order {
             switch($media) :
 
                 case 'email' :
-                    $info_content   = carbon_get_theme_option('info_cashback_email');
+                    $info_content   = sejolisa_carbon_get_theme_option('info_cashback_email');
                     break;
 
                 case 'whatsapp' :
-                    $info_content   = carbon_get_theme_option('info_cashback_whatsapp');
+                    $info_content   = sejolisa_carbon_get_theme_option('info_cashback_whatsapp');
                     break;
 
                 case 'sms' :
-                    $info_content   = carbon_get_theme_option('info_cashback_sms');
+                    $info_content   = sejolisa_carbon_get_theme_option('info_cashback_sms');
                     break;
 
             endswitch;

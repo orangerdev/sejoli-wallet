@@ -71,11 +71,11 @@ class User {
 	 */
 	public function set_user_group_detail(array $group_detail, $group_id, $commissions, $per_product ) {
 
-		$group_detail['cashback_activate']   = boolval(carbon_get_post_meta($group_id, 'cashback_activate'));
-        $group_detail['cashback_value']      = floatval(carbon_get_post_meta($group_id, 'cashback_value'));
-        $group_detail['cashback_type']       = carbon_get_post_meta($group_id, 'cashback_type');
-        $group_detail['cashback_max']        = floatval(carbon_get_post_meta($group_id, 'cashback_max'));
-        $group_detail['cashback_refundable'] = boolval(carbon_get_post_meta($group_id, 'cashback_refundable'));
+		$group_detail['cashback_activate']   = boolval(sejolisa_carbon_get_post_meta($group_id, 'cashback_activate'));
+        $group_detail['cashback_value']      = floatval(sejolisa_carbon_get_post_meta($group_id, 'cashback_value'));
+        $group_detail['cashback_type']       = sejolisa_carbon_get_post_meta($group_id, 'cashback_type');
+        $group_detail['cashback_max']        = floatval(sejolisa_carbon_get_post_meta($group_id, 'cashback_max'));
+        $group_detail['cashback_refundable'] = boolval(sejolisa_carbon_get_post_meta($group_id, 'cashback_refundable'));
 
         // Setup cashback for each product
 		if(is_array($per_product) && 0 < count($per_product)) :

@@ -7,7 +7,7 @@
         $amount = $wallet_response['wallet']->available_cash;
     endif;
 
-    $currency_type = carbon_get_theme_option('sejoli_currency_type');
+    $currency_type = sejolisa_carbon_get_theme_option('sejoli_currency_type');
 
     if( $currency_type === "IDR" ) {
         $currency = 'Rp. ';
