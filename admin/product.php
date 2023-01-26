@@ -303,11 +303,11 @@ class Product {
 
 		$setup 	    = 'general';
 		$max_amount = $amount = 0.0;
-		$activate   = carbon_get_post_meta($product->ID, 'cashback_activate');
-		$value      = carbon_get_post_meta($product->ID, 'cashback_value');
-		$type       = carbon_get_post_meta($product->ID, 'cashback_type');
-		$max        = carbon_get_post_meta($product->ID, 'cashback_max');
-		$refundable = carbon_get_post_meta($product->ID, 'cashback_refundable');
+		$activate   = sejolisa_carbon_get_post_meta($product->ID, 'cashback_activate');
+		$value      = sejolisa_carbon_get_post_meta($product->ID, 'cashback_value');
+		$type       = sejolisa_carbon_get_post_meta($product->ID, 'cashback_type');
+		$max        = sejolisa_carbon_get_post_meta($product->ID, 'cashback_max');
+		$refundable = sejolisa_carbon_get_post_meta($product->ID, 'cashback_refundable');
 
 		// Modify reward point by user group
 		if(is_user_logged_in()) :
