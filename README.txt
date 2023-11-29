@@ -40,6 +40,10 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 1.2.2
+Fix layout with checkout page v2
+Fix wallet partial & wallet usage
+
 = 1.2.1
 Improve performance
 
