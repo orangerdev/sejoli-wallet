@@ -106,16 +106,16 @@ class Checkout {
 
 	        endif;
 
-			if(false === $disable_wallet && true === $using_wallet_only) :
+			if(false === $disable_wallet && true === $using_wallet_only || false === $disable_wallet && false === $using_wallet_only) :
 
 				if('digital' === $product->type) :
 
-					$get_total = $response['calculate']['total'];
+					$get_total = $response['calculate']['total'] + $response['calculate']['cart_detail']['wallet'];
 					require_once( plugin_dir_path( __FILE__ ) . '/partials/digital/wallet-field.php');
 		        
 		        else :
 					
-					$get_total = $response['calculate']['total'];
+					$get_total = $response['calculate']['total'] + $response['calculate']['cart_detail']['wallet'];
 					require_once( plugin_dir_path( __FILE__ ) . '/partials/physical/wallet-field.php');
 		        
 		        endif;
@@ -169,6 +169,14 @@ class Checkout {
 				endif;
 			endif;
 
+			if(false === $disable_wallet && false === $using_wallet_only) :
+				if('digital' === $this->product->type) :
+					require_once( plugin_dir_path( __FILE__ ) . 'partials/digital/footer-partial-js.php');
+				else :
+					require_once( plugin_dir_path( __FILE__ ) . 'partials/physical/footer-partial-js.php');
+				endif;
+			endif;
+
 		endif;
 
 		if( sejolisa_verify_checkout_page('renew') && $this->enable_wallet ) :
@@ -178,6 +186,10 @@ class Checkout {
             
             if(false === $disable_wallet && true === $using_wallet_only) :
 				require_once( plugin_dir_path( __FILE__ ) . 'partials/digital/footer-renew-js.php');
+			endif;
+
+			if(false === $disable_wallet && false === $using_wallet_only) :
+				require_once( plugin_dir_path( __FILE__ ) . 'partials/digital/footer-renew-partial-js.php');
 			endif;
 
 		endif;

@@ -3,22 +3,6 @@
     'use strict';
 
     $(window).load(function() {
-        let order_total      = $('input[name=order-total]').val();
-        let available_wallet = $('input[name=available-wallet]').val();
-
-        if(available_wallet < order_total) {
-            $('#use-wallet').hide();
-            setTimeout(() => {
-                $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
-            }, 5000)
-        } else {
-            $('#use-wallet').show();
-            setTimeout(() => {
-                $('#use-wallet').trigger('click');
-                $('.beli-sekarang .submit-button').text('<?php echo __('PROSES SEKARANG', 'sejoli-wallet'); ?>');
-            }, 5000)
-        }
-
         setTimeout(() => {
             $('.beli-sekarang .submit-button').attr('disabled','disabled');
         }, 5000)
@@ -27,32 +11,34 @@
     $(document).ready(function(){
         $('.metode-pembayaran').remove();
 
-        $(document).on('sejoli:calculate', function(){
+        // $(document).on('sejoli:calculate', function(){
+        //     alert("OK");
 
-            $('.beli-sekarang .submit-button').attr('disabled','disabled');
+        //     $('.beli-sekarang .submit-button').attr('disabled','disabled');
 
-            let total       = $('.beli-sekarang .total-holder').text();
-            let getTotalVal = total.replace(/\D/g, "");
+        //     let total       = $('.beli-sekarang .total-holder').text();
+        //     let getTotalVal = total.replace(/\D/g, "");
 
-            if( getTotalVal ) {
+        //     if( getTotalVal ) {
 
-                $('input[name=order-total]').val(getTotalVal)
+        //         $('input[name=order-total]').val(getTotalVal)
 
-                let order_total      = $('input[name=order-total]').val();
-                let available_wallet = $('input[name=available-wallet]').val();
-                let hasil            = available_wallet - order_total;
+        //         let order_total      = $('input[name=order-total]').val();
+        //         let available_wallet = $('input[name=available-wallet]').val();
+        //         let hasil            = available_wallet - order_total;
 
-                if( hasil > 0 ) {
-                    $('.use-wallet').show();
-                    $('.beli-sekarang .submit-button').text('<?php echo __('PROSES SEKARANG', 'sejoli-wallet'); ?>');
-                } else {
-                    $('.use-wallet').hide();
-                    $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
-                }
+        //         if( hasil > 0 ) {
+        //             $('.use-wallet').show();
+        //             $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
+        //         } else {
+        //             $('.use-wallet').hide();
+        //             $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
+        //             $('.beli-sekarang .submit-button').attr('disabled','disabled');
+        //         }
 
-            }
+        //     }
 
-        });
+        // });
 
         $('body').on('change', '#use-wallet', function(){
             sejoliSaCheckout.getCalculateAfterUseWallet();
@@ -61,8 +47,35 @@
 
             for (var i = 0, length = use_wallet.length; i < length; i++) {
                 if (use_wallet[i].checked) {
+
                     setTimeout(() => {
-                        $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
+                        let total       = $('.beli-sekarang .total-holder').text();
+                        let getTotalVal = total.replace(/\D/g, "");
+
+                        if( getTotalVal ) {
+
+                            $('input[name=order-total]').val(getTotalVal)
+
+                            let order_total      = $('input[name=order-total]').val();
+                            let available_wallet = $('input[name=available-wallet]').val();
+                            let hasil            = available_wallet - order_total;
+
+                            if( hasil > 0 ) {
+                                // $('.use-wallet').show();
+                                $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
+                                setTimeout(() => {
+                                    $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
+                                }, 100);
+                            } else {
+                                // $('.use-wallet').hide();
+                                $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
+                                setTimeout(() => {
+                                    $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                                }, 100);
+                            }
+
+                        }
+                        // $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
                     }, 1500);
 
                     break;
