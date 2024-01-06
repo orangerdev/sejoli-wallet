@@ -10,19 +10,20 @@
         if( hasil > 0 ) {
             $('#use-wallet').show();
             setTimeout(() => {
-                $('#use-wallet').trigger('click');
+                // $('#use-wallet').trigger('click');
                 $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
-            }, 2000)
+            }, 3500)
         } else {
             $('#use-wallet').hide();
             setTimeout(() => {
+                $('.beli-sekarang .submit-button').attr('disabled','disabled');
                 $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
-            }, 2000)
+            }, 3500)
         }
 
         setTimeout(() => {
             $('.beli-sekarang .submit-button').attr('disabled','disabled');
-        }, 2000)
+        }, 3500)
     });
 
     $(document).ready(function(){
@@ -55,7 +56,38 @@
                     }
 
                 }
-            }, 3000)
+            }, 5000)
+        });
+
+        $(document).on('click','.hapus-kupon',function(e){
+            e.preventDefault();
+            
+            setTimeout(() => {
+                $('.beli-sekarang .submit-button').attr('disabled','disabled');
+
+                let total       = $('.total-bayar .total-holder').text();
+                let getTotalVal = total.replace(/\D/g, "");
+
+                if( getTotalVal ) {
+
+                    $('input[name=order-total]').val(getTotalVal)
+
+                    let order_total      = $('input[name=order-total]').val();
+                    let available_wallet = $('input[name=available-wallet]').val();
+                    let hasil            = available_wallet - order_total;
+
+                    if( hasil > 0 ) {
+                        $('.use-wallet').show();
+                        $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
+                        $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                    } else {
+                        $('.use-wallet').hide();
+                        $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
+                        $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                    }
+
+                }
+            }, 5000)
         });
 
         $('body').on('change', '#use-wallet', function(){
@@ -66,8 +98,31 @@
             for (var i = 0, length = use_wallet.length; i < length; i++) {
                 if (use_wallet[i].checked) {
                     setTimeout(() => {
-                        $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
-                    }, 1500);
+                        $('.beli-sekarang .submit-button').attr('disabled','disabled');
+
+                        let total       = $('.total-bayar .total-holder').text();
+                        let getTotalVal = total.replace(/\D/g, "");
+
+                        if( getTotalVal ) {
+
+                            $('input[name=order-total]').val(getTotalVal)
+
+                            let order_total      = $('input[name=order-total]').val();
+                            let available_wallet = $('input[name=available-wallet]').val();
+                            let hasil            = available_wallet - order_total;
+
+                            if( hasil > 0 ) {
+                                // $('.use-wallet').show();
+                                $('.beli-sekarang .submit-button').text('<?php echo __('BUAT PESANAN', 'sejoli-wallet'); ?>');
+                                $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                            } else {
+                                // $('.use-wallet').hide();
+                                $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
+                                $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                            }
+
+                        }
+                    }, 1500)
 
                     break;
                 } else {

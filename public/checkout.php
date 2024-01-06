@@ -80,7 +80,7 @@ class Checkout {
 	                'payment_gateway' => 'manual',
 	                'shipment'        => NULL,
 	                'variants'        => [],
-	                // 'wallet'		  => false,
+	                'wallet'		  => false
 	            ]);
 	            $response = [];
 	            $request['product_id'] = $product->ID;
