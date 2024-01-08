@@ -9,13 +9,31 @@
                     <input id='use-wallet' class='use-wallet' type="checkbox" name="use-wallet" value="">
                     <input id='order-total' type="hidden" name="order-total" value="<?php echo $get_total; ?>">
                     <input id='order-rawtotal' type="hidden" name="order-rawtotal" value="">
-                    <input id='available-wallet' type="hidden" name="available-wallet" value="<?php echo $wallet_data['wallet']->available_total; ?>">
+                    <input id='available-wallet' type="hidden" name="available-wallet" value="<?php echo $wallet->available_total; ?>">
                     <span>
                     <?php
+                    if( $wallet->available_total > $get_total ) :
+                        
                         printf(
                             __('Dana yang tersedia %s, ingin menggunakan dana yang ada untuk pembayaran?', 'sejoli'),
                             sejolisa_price_format($wallet->available_total)
                         );
+
+                    elseif ( true !== $using_wallet_only && $wallet->available_total < $get_total ) :
+
+                        printf(
+                            __('Dana yang tersedia %s, ingin menggunakan dana yang ada untuk pembayaran?', 'sejoli'),
+                            sejolisa_price_format($wallet->available_total)
+                        );
+
+                    elseif ( true === $using_wallet_only && $wallet->available_total < $get_total ) :
+
+                        printf(
+                            __('Dana yang tersedia %s, dana tidak cukup untuk digunakan pembayaran!', 'sejoli'),
+                            sejolisa_price_format($wallet->available_total)
+                        );
+
+                    endif;
                     ?>
                 </label>
             </p>

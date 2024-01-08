@@ -4,12 +4,10 @@
 
     $(document).ready(function(){
 
-        $(document).on('sejoli:calculate', function(){
-            console.log('ahoy');
-        });
-
         $('body').on('change', '#use-wallet', function(){
-            sejoliSaCheckout.getCalculate();
+            sejoliSaCheckout.getCalculateAfterUseWallet();
+
+            $('.kode-diskon-form .alert-holder').hide();
         });
     });
 })(jQuery);
