@@ -40,6 +40,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 1.2.4
+Fix bug calculating grand total in partial payment
+
 = 1.2.3
 Fix error notice in checkout renew
 Fix ajax wallet usage in checkout digital & physical (pay using wallet only)

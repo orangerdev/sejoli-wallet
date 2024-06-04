@@ -6,7 +6,7 @@
         $('body').on('change', '#use-wallet', function(){
             sejoliSaCheckoutFisik.func.getCalculateAfterUseWallet();
 
-            $('.kode-diskon-form .alert-holder').hide();
+            // $('.kode-diskon-form .alert-holder').hide();
         });
     });
 })(jQuery);
