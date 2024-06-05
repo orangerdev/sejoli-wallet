@@ -6,8 +6,6 @@
 
         $('body').on('change', '#use-wallet', function(){
             sejoliSaCheckout.getCalculateAfterUseWallet();
-
-            // $('.kode-diskon-form .alert-holder').hide();
         });
     });
 })(jQuery);

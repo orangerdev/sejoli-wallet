@@ -107,23 +107,6 @@ class Order {
 
 			if(false !== $wallet_data['valid'] && 0.0 < floatval($wallet_data['wallet']->available_total)) :
 
-				// if(isset($post_data['coupon']) && !empty($post_data['coupon']) && 'undefined' !== $post_data['coupon']) {
-				// 	$get_coupon        = sejolisa_get_coupon_by_code($post_data['coupon']);
-				// 	$get_discount_type = $get_coupon['coupon']['discount']['type'];
-
-				// 	if('percentage' === $get_discount_type) :
-				// 		$total = $total - ($total * $get_coupon['coupon']['discount']['value'] / 100);
-				// 	else :
-				// 		if('per_item' === $get_coupon['coupon']['discount']['usage']) :
-				// 			$total = $total - ($post_data['quantity'] * $get_coupon['coupon']['discount']['value']);
-				// 		else :
-				// 			$total = $total - $get_coupon['coupon']['discount']['value'];
-				// 		endif;
-				// 	endif;
-				// } else {
-				// 	$get_coupon = '';
-				// }
-
 				if(isset($post_data['shipment']) && !empty($post_data['shipment']) && 'undefined' !== $post_data['shipment']) {
 					list($courier,$service,$cost) = explode(':::', $post_data['shipment']);
 					$total += $cost;
