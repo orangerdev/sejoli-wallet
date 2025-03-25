@@ -112,8 +112,17 @@ class Order {
 					$total += $cost;
 				}
 
-				$subtotal = $total - floatval($wallet_data['wallet']->available_total);
-				$total_use_wallet = $total;
+				$discount_value = 0;
+				if(isset($post_data['coupon'])):
+					$getCoupon = sejolisa_get_coupon_by_code( $post_data['coupon'] );
+
+					if(true === boolval($getCoupon['valid'])):
+						$discount_value = apply_filters('sejoli/coupon/value', $getCoupon['coupon']['discount']['value'], $total, $getCoupon['coupon'], $post_data);
+					endif;
+				endif;
+		
+				$subtotal = ($total - $discount_value) - floatval($wallet_data['wallet']->available_total);
+				$total_use_wallet = $total - $discount_value;
 
 				if($subtotal < 0) :
 
@@ -178,7 +187,7 @@ class Order {
 
 		if($this->order_use_wallet) :
 			
-			$detail['wallet'] = $this->wallet_amount;
+			$detail['wallet'] = '-' .$this->wallet_amount;
 	
 		endif;
 
@@ -331,10 +340,12 @@ class Order {
      */
     public function add_cashback_info($content, $media, $recipient_type, $order_detail) {
 
-        if(
-            'completed' === $order_detail['order_data']['status'] &&
-            in_array($recipient_type, array('buyer', 'affiliate'))
-        ) :
+        if (
+		    isset($order_detail['order_data']) && 
+		    isset($order_detail['order_data']['status']) &&
+		    'completed' === $order_detail['order_data']['status'] && 
+		    in_array($recipient_type, array('buyer', 'affiliate'))
+		) :
 
             switch($media) :
 

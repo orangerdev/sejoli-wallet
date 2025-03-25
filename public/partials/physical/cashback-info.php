@@ -1,5 +1,5 @@
 <tr>
-    <td colspan='2' style="width: 70%; vertical-align: middle;">
+    <td style="width: 70%; vertical-align: middle;">
         <?php if(false === $product->enable_quantity) : ?>
         <p><?php _e('Potensi cashback yang anda dapatkan', 'sejoli'); ?></p>
         <?php else : ?>

@@ -1,6 +1,6 @@
 <tr>
-    <td colspan="3" style="text-align: left; padding: 20px 10px 2px 10px;">
-        <div class="ui info message">
+    <td colspan="2" style="text-align: left; padding: 20px 10px 20px 10px;">
+        <div class="ui info message wallet-option">
             <div class="header">
                 <?php _e('Dana di dompet', 'sejoli'); ?>
             </div>
