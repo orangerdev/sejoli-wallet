@@ -4,8 +4,20 @@
 
     $(window).load(function() {
         let order_total      = $('input[name=order-total]').val();
-        let available_wallet = $('input[name=available-wallet]').val();
-        let hasil            = available_wallet - order_total;
+        let available_wallet = document.getElementById('available-wallet').value;
+        let hasil = available_wallet - order_total;
+
+        if(order_total === '0' || order_total === '00'){
+            $('.wallet-option').hide();
+            $('.use-wallet').hide();
+            $('.metode-pembayaran').hide();
+            $('input[name="payment_gateway"]').prop('checked', false);
+        } else {
+            $('.wallet-option').show();
+            $('.use-wallet').show();
+            $('.metode-pembayaran').show();
+            $('input[name="payment_gateway"]').prop('checked', true);
+        }
 
         if( hasil > 0 ) {
             $('#use-wallet').show();
@@ -31,14 +43,13 @@
 
         $(document).on('sejoli:calculate', function(){
 
-            let total       = $('.rincian-pesanan table tr:first-child td:last-child').text();
+            let total       = $('.total-bayar .total-holder:last').text();
             let getTotalVal = total.match(/\d/g).join('')
             
-            document.getElementById("order-rawtotal").value = getTotalVal;
+            document.getElementById("order-total").value = getTotalVal;
 
-            let order_total      = $('input[name=order-rawtotal]').val();
+            let order_total      = $('input[name=order-total]').val();
             let available_wallet = document.getElementById('available-wallet').value;
-
             let hasil = available_wallet - order_total;
 
             if( hasil > 0 ) {
@@ -55,22 +66,37 @@
                 }, 100);
             }
 
+            if(order_total === '0' || order_total === '00'){
+                $('.wallet-option').hide();
+                $('.use-wallet').hide();
+                $('.metode-pembayaran').hide();
+                $('input[name="payment_gateway"]').prop('checked', false);
+                setTimeout(() => {
+                    $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                }, 100);
+            } else {
+                $('.wallet-option').show();
+                $('.use-wallet').show();
+                $('.metode-pembayaran').show();
+                $('input[name="payment_gateway"]').prop('checked', true);
+            }
+
         });
 
         $(document).on('keyup', '#apply_coupon', function(){
             setTimeout(() => {
                 $('.beli-sekarang .submit-button').attr('disabled','disabled');
 
-                let total       = $('.total-bayar .total-holder').text();
+                let total       = $('.total-bayar .total-holder:last').text();
                 let getTotalVal = total.replace(/\D/g, "");
 
                 if( getTotalVal ) {
 
-                    $('input[name=order-total]').val(getTotalVal);
+                    document.getElementById("order-total").value = getTotalVal;
 
                     let order_total      = $('input[name=order-total]').val();
-                    let available_wallet = $('input[name=available-wallet]').val();
-                    let hasil            = available_wallet - order_total;
+                    let available_wallet = document.getElementById('available-wallet').value;
+                    let hasil = available_wallet - order_total;
 
                     if( hasil > 0 ) {
                         $('.use-wallet').show();
@@ -80,6 +106,19 @@
                         $('.use-wallet').hide();
                         $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
                         $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                    }
+
+                    if(order_total === '0' || order_total === '00'){
+                        $('.wallet-option').hide();
+                        $('.use-wallet').hide();
+                        $('.metode-pembayaran').hide();
+                        $('input[name="payment_gateway"]').prop('checked', false);
+                        $('.beli-sekarang .submit-button').removeAttr('disabled','disabled');
+                    } else {
+                        $('.wallet-option').show();
+                        $('.use-wallet').show();
+                        $('.metode-pembayaran').show();
+                        $('input[name="payment_gateway"]').prop('checked', true);
                     }
 
                 }
@@ -92,16 +131,16 @@
             setTimeout(() => {
                 $('.beli-sekarang .submit-button').attr('disabled','disabled');
 
-                let total       = $('.total-bayar .total-holder').text();
+                let total       = $('.total-bayar .total-holder:last').text();
                 let getTotalVal = total.replace(/\D/g, "");
 
                 if( getTotalVal ) {
 
-                    $('input[name=order-total]').val(getTotalVal)
+                    document.getElementById("order-total").value = getTotalVal;
 
                     let order_total      = $('input[name=order-total]').val();
-                    let available_wallet = $('input[name=available-wallet]').val();
-                    let hasil            = available_wallet - order_total;
+                    let available_wallet = document.getElementById('available-wallet').value;
+                    let hasil = available_wallet - order_total;
 
                     if( hasil > 0 ) {
                         $('.use-wallet').show();
@@ -110,6 +149,19 @@
                     } else {
                         $('.use-wallet').hide();
                         $('.beli-sekarang .submit-button').text('<?php echo __('SALDO TIDAK MENCUKUPI', 'sejoli-wallet'); ?>');
+                        $('.beli-sekarang .submit-button').attr('disabled','disabled');
+                    }
+
+                    if(order_total === '0' || order_total === '00'){
+                        $('.wallet-option').hide();
+                        $('.use-wallet').hide();
+                        $('.metode-pembayaran').hide();
+                        $('input[name="payment_gateway"]').prop('checked', false);
+                    } else {
+                        $('.wallet-option').show();
+                        $('.use-wallet').show();
+                        $('.metode-pembayaran').show();
+                        $('input[name="payment_gateway"]').prop('checked', true);
                         $('.beli-sekarang .submit-button').attr('disabled','disabled');
                     }
 
@@ -125,12 +177,12 @@
             for (var i = 0, length = use_wallet.length; i < length; i++) {
                 if (use_wallet[i].checked) {
                     setTimeout(() => {
-                        let total       = $('.rincian-pesanan table tr:first-child td:last-child').text();
+                        let total       = $('.total-bayar .total-holder:last').text();
                         let getTotalVal = total.match(/\d/g).join('')
                         
-                        document.getElementById("order-rawtotal").value = getTotalVal;
+                        document.getElementById("order-total").value = getTotalVal;
 
-                        let order_total      = $('input[name=order-rawtotal]').val();
+                        let order_total      = $('input[name=order-total]').val();
                         let available_wallet = document.getElementById('available-wallet').value;
 
                         let hasil = available_wallet - order_total;
