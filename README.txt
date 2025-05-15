@@ -40,6 +40,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 1.2.6
+Fix performance query
+
 = 1.2.5
 Fix bug apply coupon product phisycal and digital in using wallet only and partial
 Fix bug wallet with coupon if coupon free ongkir/discount 100% Fix bug apply coupon product phisycal and digital in using wallet only and partial

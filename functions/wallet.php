@@ -430,6 +430,7 @@ function sejoli_get_all_request_fund(array $args, $table = array()) {
  */
 function sejoli_request_wallet_fund(array $args) {
 
+    $amount  = $args['value'];
     $user_id = get_current_user_id();
     $args    = wp_parse_args($args, array(
                     'value' => $amount,

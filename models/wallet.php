@@ -2,8 +2,6 @@
 
 namespace SEJOLI_WALLET\Model;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-
 Class Wallet extends \SejoliSA\Model
 {
     static protected $value        = 0;
@@ -259,17 +257,21 @@ Class Wallet extends \SejoliSA\Model
      */
     static protected function check_existing_cashback() {
 
-        parent::$table = self::$table;
+        global $wpdb;
 
-        $data = Capsule::table(self::table())
-                    ->where(array(
-                        'order_id'    => self::$order_id,
-                        'user_id'     => self::$user->ID,
-                        'type'        => self::$type,
-                    ))
-                    ->first();
+        $table_name = $wpdb->prefix . self::$table;
+
+        $query = $wpdb->prepare(
+            "SELECT * FROM $table_name WHERE order_id = %d AND user_id = %d AND type = %s LIMIT 1",
+            self::$order_id,
+            self::$user->ID,
+            self::$type
+        );
+
+        $data = $wpdb->get_row($query);
 
         return boolval($data);
+
     }
 
     /**
@@ -281,13 +283,15 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('add');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
             self::$type  = 'in';
 
-            if(false === self::check_existing_cashback()) :
+            if (false === self::check_existing_cashback()) :
 
-                parent::$table = self::$table;
+                global $wpdb;
+
+                $table_name = $wpdb->prefix . self::$table;
 
                 $wallet = [
                     'created_at'   => current_time('mysql'),
@@ -302,18 +306,25 @@ Class Wallet extends \SejoliSA\Model
                     'meta_data'    => serialize(self::$meta_data),
                 ];
 
-                $wallet['ID'] = Capsule::table(self::table())
-                                ->insertGetId($wallet);
+                $wpdb->insert(
+                    $table_name,  
+                    $wallet,       
+                    [
+                        '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%d', '%s'
+                    ]
+                );
 
-                self::set_valid     (true);
-                self::set_respond   ('wallet', $wallet);
+                $wallet['ID'] = $wpdb->insert_id;
+
+                self::set_valid(true);
+                self::set_respond('wallet', $wallet);
 
             else :
 
                 self::set_valid(false);
                 self::set_message(
                     sprintf(
-                        __('Add cashback value for order %s and user %s already exists', 'sejoli'),
+                        __('Add cashback value for order %s and user %s already exists', 'sejoli-wallet'),
                         self::$order_id,
                         self::$user->ID
                     )
@@ -324,6 +335,7 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+
     }
 
     /**
@@ -335,10 +347,11 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('manual-input');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
+            global $wpdb;
 
-            parent::$table = self::$table;
+            $table_name = $wpdb->prefix . self::$table;
 
             $wallet = [
                 'created_at'   => current_time('mysql'),
@@ -353,15 +366,23 @@ Class Wallet extends \SejoliSA\Model
                 'meta_data'    => serialize(self::$meta_data),
             ];
 
-            $wallet['ID'] = Capsule::table(self::table())
-                            ->insertGetId($wallet);
+            $wpdb->insert(
+                $table_name,  
+                $wallet,       
+                [
+                    '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%d', '%s'
+                ]
+            );
 
-            self::set_valid     (true);
-            self::set_respond   ('wallet', $wallet);
+            $wallet['ID'] = $wpdb->insert_id;
+
+            self::set_valid(true);
+            self::set_respond('wallet', $wallet);
 
         endif;
 
         return new static;
+
     }
 
     /**
@@ -373,34 +394,36 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('get-single');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
-            parent::$table = self::$table;
+            global $wpdb;
 
-            $query = Capsule::table(self::table())
-                            ->where(array(
-                                'order_id'    => self::$order_id,
-                                'user_id'     => self::$user->ID,
-                                'valid_point' => true
-                            ));
+            $table_name = $wpdb->prefix . self::$table;
 
-            $wallet = $query->first();
+            $query = $wpdb->prepare(
+                "SELECT * FROM $table_name WHERE order_id = %d AND user_id = %d AND valid_point = 1 LIMIT 1",
+                self::$order_id,
+                self::$user->ID
+            );
 
-            if($wallet) :
+            $wallet = $wpdb->get_row($query);
+
+            if ($wallet) :
 
                 self::set_valid(true);
                 self::set_respond('wallet', $wallet);
 
             else :
 
-                $query = Capsule::table(self::table())
-                                ->where(array(
-                                    'order_id'    => self::$order_id,
-                                    'user_id'     => self::$user->ID,
-                                ))
-                            ->first();
+                $query = $wpdb->prepare(
+                    "SELECT * FROM $wpdb->prefix" . self::$table . " WHERE order_id = %d AND user_id = %d LIMIT 1",
+                    self::$order_id,
+                    self::$user->ID
+                );
 
-                if($wallet) :
+                $wallet = $wpdb->get_row($query);
+
+                if ($wallet) :
 
                     self::set_valid(true);
                     self::set_respond('wallet', $wallet);
@@ -416,6 +439,7 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+
     }
 
     /**
@@ -427,18 +451,20 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('get-detail');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
-            parent::$table = self::$table;
+            global $wpdb;
 
-            $query = Capsule::table(self::table())
-                            ->where(array(
-                                'ID'    => self::$id,
-                            ));
+            $table_name = $wpdb->prefix . self::$table;
 
-            $point = $query->first();
+            $query = $wpdb->prepare(
+                "SELECT * FROM $table_name WHERE ID = %d LIMIT 1",
+                self::$id
+            );
 
-            if($point) :
+            $point = $wpdb->get_row($query);
+
+            if ($point) :
 
                 self::set_valid(true);
                 self::set_respond('point', $point);
@@ -452,6 +478,7 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+
     }
 
     /**
@@ -463,23 +490,25 @@ Class Wallet extends \SejoliSA\Model
 
         global $wpdb;
 
-        parent::$table = self::$table;
+        $table_name = $wpdb->prefix . self::$table;
 
-        $query        = Capsule::table( Capsule::raw( self::table() . ' AS wallet' ))
-                        ->select(
-                            'wallet.*',
-                            'user.display_name',
-                            'user.user_email'
-                        )
-                        ->join(
-                            $wpdb->users . ' AS user', 'user.ID', '=', 'wallet.user_id'
-                        );
-        $query        = self::set_filter_query( $query );
-        $recordsTotal = $query->count();
-        $query        = self::set_length_query($query);
-        $wallet       = $query->get()->toArray();
+        $query = "
+            SELECT wallet.*, user.display_name, user.user_email
+            FROM {$table_name} AS wallet
+            JOIN {$wpdb->users} AS user ON user.ID = wallet.user_id
+        ";
 
-        if ( $wallet ) :
+        $query = self::set_filter_query($query);
+
+        $query = self::set_orderby_query($query, null);
+
+        $recordsTotal = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name} AS wallet");
+
+        $query = self::set_length_query($query);
+
+        $wallet = $wpdb->get_results($query);
+
+        if ($wallet) :
             self::set_respond('valid', true);
             self::set_respond('wallet', $wallet);
             self::set_respond('recordsTotal', $recordsTotal);
@@ -492,6 +521,7 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+
     }
 
     /**
@@ -502,47 +532,37 @@ Class Wallet extends \SejoliSA\Model
 
         global $wpdb;
 
-        parent::$table = self::$table;
+        $table_name = $wpdb->prefix . self::$table;
 
-        $query  = Capsule::table( Capsule::raw( self::table() . ' AS wallet' ))
-                    ->select(
-                        'wallet.user_id',
-                        'user.display_name',
-                        'user.user_email',
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" AND refundable = 1 THEN value ELSE 0 END) AS cash_value'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" AND refundable = 0 THEN value ELSE 0 END) AS point_value' // Non refundable
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "out" THEN value ELSE 0 END) AS used_value'
-                        ),
-                        Capsule::raw(
-                            'SUM(
-                                CASE
-                                    WHEN type = "in" AND refundable = 1 THEN value
-                                    WHEN type = "in" AND refundable = 0 THEN 0
-                                    ELSE -value
-                                END
-                             ) AS available_cash'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN value ELSE -value END) AS available_total'
-                        )
-                    )
-                    ->join(
-                        $wpdb->users . ' AS user', 'user.ID', '=', 'wallet.user_id'
-                    )
-                    ->where('valid_point', true)
-                    ->orderBy('available_total', 'DESC')
-                    ->groupBy('user_id');
+        $query = "
+            SELECT 
+                wallet.user_id,
+                user.display_name,
+                user.user_email,
+                SUM(CASE WHEN type = 'in' AND refundable = 1 THEN value ELSE 0 END) AS cash_value,
+                SUM(CASE WHEN type = 'in' AND refundable = 0 THEN value ELSE 0 END) AS point_value,
+                SUM(CASE WHEN type = 'out' THEN value ELSE 0 END) AS used_value,
+                SUM(
+                    CASE
+                        WHEN type = 'in' AND refundable = 1 THEN value
+                        WHEN type = 'in' AND refundable = 0 THEN 0
+                        ELSE -value
+                    END
+                ) AS available_cash,
+                SUM(CASE WHEN type = 'in' THEN value ELSE -value END) AS available_total
+            FROM {$table_name} AS wallet
+            INNER JOIN {$wpdb->users} AS user ON user.ID = wallet.user_id
+            WHERE wallet.valid_point = 1
+        ";
 
-        $query  = self::set_filter_query( $query );
+        $query = self::set_filter_query($query);
 
-        $result = $query->get();
+        $query .= "GROUP BY wallet.user_id 
+            ORDER BY available_total DESC";
 
-        if($result) :
+        $result = $wpdb->get_results($query);
+
+        if ($result) :
 
             self::set_valid(true);
             self::set_respond('wallet', $result);
@@ -550,11 +570,12 @@ Class Wallet extends \SejoliSA\Model
         else :
 
             self::set_valid(false);
-            self::set_message( __('No point data', 'sejoli'));
+            self::set_message(__('No point data', 'sejoli-wallet'));
 
         endif;
 
         return new static;
+
     }
 
     /**
@@ -565,50 +586,43 @@ Class Wallet extends \SejoliSA\Model
 
         global $wpdb;
 
-        parent::$table = self::$table;
+        $table_name = $wpdb->prefix . self::$table;
 
-        $query  = Capsule::table( self::table() )
-                    ->select(
-                        'user_id',
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" AND refundable = 1 THEN value ELSE 0 END) AS cash_value'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" AND refundable = 0 THEN value ELSE 0 END) AS point_value' // Non refundable
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "out" THEN value ELSE 0 END) AS used_value'
-                        ),
-                        Capsule::raw(
-                            'SUM(
-                                CASE
-                                    WHEN type = "in" AND refundable = 1 THEN value
-                                    WHEN type = "in" AND refundable = 0 THEN 0
-                                    ELSE -value
-                                END
-                             ) AS available_cash'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN value ELSE -value END) AS available_total'
-                        )
-                    )
-                    ->where('valid_point', true)
-                    ->where('user_id', self::$user_id)
-                    ->first();
+        $query = "
+            SELECT
+                wallet.user_id,
+                SUM(CASE WHEN wallet.type = 'in' AND wallet.refundable = 1 THEN wallet.value ELSE 0 END) AS cash_value,
+                SUM(CASE WHEN wallet.type = 'in' AND wallet.refundable = 0 THEN wallet.value ELSE 0 END) AS point_value,
+                SUM(CASE WHEN wallet.type = 'out' THEN wallet.value ELSE 0 END) AS used_value,
+                SUM(
+                    CASE
+                        WHEN wallet.type = 'in' AND wallet.refundable = 1 THEN wallet.value
+                        WHEN wallet.type = 'in' AND wallet.refundable = 0 THEN 0
+                        ELSE -wallet.value
+                    END
+                ) AS available_cash,
+                SUM(CASE WHEN wallet.type = 'in' THEN wallet.value ELSE -wallet.value END) AS available_total
+            FROM {$table_name} AS wallet
+            WHERE wallet.valid_point = 1
+            AND wallet.user_id = %d
+            GROUP BY wallet.user_id
+            LIMIT 1
+        ";
 
-        if($query) :
+        $query = $wpdb->prepare($query, self::$user_id);
 
+        $query = $wpdb->get_row($query);
+
+        if ($query) :
             self::set_valid(true);
             self::set_respond('wallet', $query);
-
         else :
-
             self::set_valid(false);
-            self::set_message( sprintf( __('No wallet data for user %s', 'sejoli'), self::$user_id));
-
+            self::set_message(sprintf(__('No wallet data for user %s', 'sejoli-wallet'), self::$user_id));
         endif;
 
         return new static;
+
     }
 
     /**
@@ -620,9 +634,11 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('reduce');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
-            parent::$table = self::$table;
+            global $wpdb;
+
+            $table_name = $wpdb->prefix . self::$table;
 
             $wallet = [
                 'created_at'   => current_time('mysql'),
@@ -637,8 +653,15 @@ Class Wallet extends \SejoliSA\Model
                 'valid_point'  => true
             ];
 
-            $wallet['ID'] = Capsule::table(self::table())
-                            ->insertGetId($wallet);
+            $wpdb->insert(
+                $table_name, 
+                $wallet,                     
+                [
+                    '%s', '%d', '%d', '%d', '%f', '%s', '%s', '%d', '%s', '%d'
+                ]
+            );
+
+            $wallet['ID'] = $wpdb->insert_id;
 
             self::set_valid(true);
             self::set_respond('wallet', $wallet);
@@ -646,6 +669,7 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+
     }
 
     /**
@@ -657,21 +681,38 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('update-valid-point');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
-            parent::$table = self::$table;
+            global $wpdb;
 
-            Capsule::table(self::table())
-                            ->where('order_id', self::$order_id)
-                            ->update(array(
-                                'valid_point'   => self::$valid_point
-                            ));
+            $table_name = $wpdb->prefix . self::$table;
 
-            self::set_valid(true);
+            $data = [
+                'valid_point' => self::$valid_point
+            ];
+
+            $where = [
+                'order_id' => self::$order_id
+            ];
+
+            $updated = $wpdb->update(
+                $table_name, 
+                $data,                        
+                $where,                       
+                ['%d'],                       
+                ['%d']                        
+            );
+
+            if ($updated !== false) :
+                self::set_valid(true);
+            else :
+                self::set_valid(false);
+            endif;
 
         endif;
 
         return new static;
+
     }
 
     /**
@@ -683,9 +724,11 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('request');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
-            parent::$table = self::$table;
+            global $wpdb;
+
+            $table_name = $wpdb->prefix . self::$table;
 
             $wallet = [
                 'created_at'   => current_time('mysql'),
@@ -700,8 +743,15 @@ Class Wallet extends \SejoliSA\Model
                 'valid_point'  => true
             ];
 
-            $wallet['ID'] = Capsule::table(self::table())
-                            ->insertGetId($wallet);
+            $wpdb->insert(
+                $table_name, 
+                $wallet,                     
+                [
+                    '%s', '%d', '%d', '%d', '%f', '%s', '%s', '%d', '%s', '%d' 
+                ]
+            );
+
+            $wallet['ID'] = $wpdb->insert_id;
 
             self::set_valid(true);
             self::set_respond('wallet', $wallet);
@@ -709,6 +759,7 @@ Class Wallet extends \SejoliSA\Model
         endif;
 
         return new static;
+
     }
 
     /**
@@ -720,26 +771,37 @@ Class Wallet extends \SejoliSA\Model
         self::set_action('update-request-fund');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) :
 
-            parent::$table = self::$table;
+            global $wpdb;
 
-            $valid = Capsule::table(self::table())
-                            ->where(array(
-                                'ID'      => self::$id,
-                                'label'   => 'request',
-                                'type'    => 'out'
-                            ))
-                            ->update(array(
-                                'valid_point'   => self::$valid_point,
-                                'meta_data'     => serialize(self::$meta_data)
-                            ));
+            $table_name = $wpdb->prefix . self::$table;
 
-            self::set_valid(boolval($valid));
+            $data = [
+                'valid_point' => self::$valid_point,
+                'meta_data'   => serialize(self::$meta_data)
+            ];
+
+            $where = [
+                'ID'    => self::$id,
+                'label' => 'request',
+                'type'  => 'out'
+            ];
+
+            $updated = $wpdb->update(
+                $table_name, 
+                $data,                        
+                $where,                       
+                ['%d', '%s'],                 
+                ['%d', '%s', '%s']            
+            );
+
+            self::set_valid($updated !== false);
 
         endif;
 
         return new static;
 
     }
+
 }
