@@ -12,7 +12,7 @@ class RequestFund extends \SejoliSA\Notification\Main {
      * @since   1.0.0
      * @var     array
      */
-    protected $recipiens;
+    protected $recipients;
 
     /**
      * Set user data

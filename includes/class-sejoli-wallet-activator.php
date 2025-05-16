@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-
 /**
  * Fired during plugin activation
  *
@@ -24,35 +22,43 @@ use Illuminate\Database\Capsule\Manager as Capsule;
  */
 class Sejoli_Wallet_Activator {
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function activate() {
+    /**
+     * Short Description. (use period)
+     *
+     * Long Description.
+     *
+     * @since    1.0.0
+     */
+    public static function activate() {
 
-		global $wpdb;
+        global $wpdb;
 
-		$table = $wpdb->prefix . 'sejolisa_wallet';
+        $table = $wpdb->prefix . 'sejolisa_wallet';
 
-		if(!Capsule::schema()->hasTable( $table )):
-            Capsule::schema()->create( $table, function($table){
-                $table->increments  ('ID');
-                $table->datetime    ('created_at');
-                $table->integer     ('order_id');
-                $table->integer     ('product_id');
-                $table->integer     ('user_id');
-                $table->integer     ('value');
-                $table->enum        ('type', array('in', 'out'));
-				$table->string 		('label');
-				$table->boolean     ('refundable');
-				$table->boolean		('valid_point');
-                $table->text        ('meta_data')->nullable();
-            });
+        if($wpdb->get_var("SHOW TABLES LIKE '$table'") != $table) :
+
+            $charset_collate = $wpdb->get_charset_collate();
+
+            $sql = "CREATE TABLE $table (
+                ID bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+                created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                order_id int(11) NOT NULL,
+                product_id int(11) NOT NULL,
+                user_id int(11) NOT NULL,
+                value int(11) NOT NULL,
+                type ENUM('in', 'out') NOT NULL,
+                label varchar(255) NOT NULL,
+                refundable boolean NOT NULL,
+                valid_point boolean NOT NULL,
+                meta_data text DEFAULT NULL,
+                PRIMARY KEY (ID)
+            ) $charset_collate;";
+
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+
         endif;
 
-	}
+    }
 
 }

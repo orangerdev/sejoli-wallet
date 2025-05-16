@@ -25,6 +25,14 @@ class Notification {
 	 */
 	private $version;
 
+	/**
+	 * Notification libraries
+	 * @since 	1.0.0
+	 * @access 	protected
+	 * @var 	array
+	 */
+	protected $libraries = false;
+
     /**
 	 * Series of notification files
 	 * @since	1.0.0
