@@ -125,6 +125,141 @@ Class Wallet extends \SejoliSA\Model
     }
 
     /**
+     * Set order query
+     * @since   1.0.0
+     */
+    static protected function set_orderby_query($query, $additional_key) {
+
+        global $wpdb;
+
+        if (!is_null(self::$filter['order']) && is_array(self::$filter['order'])) :
+
+            $order_by = [];
+            
+            foreach (self::$filter['order'] as $column => $sort) :
+            
+                if($additional_key === null):
+                    $order_by[] = "{$column} {$sort}";
+                else:
+                    $order_by[] = "{$additional_key}, {$column} {$sort}";
+                endif;
+            
+            endforeach;
+
+            $query .= " ORDER BY " . implode(", ", $order_by); // Menggabungkan hasil ORDER BY
+        
+        else:
+        
+            $query .= " ORDER BY ID DESC";  // Default ordering
+        
+        endif;
+
+        return $query;
+    
+    }
+
+    /**
+     * Set length query
+     * @since   1.0.0
+     */
+    static protected function set_length_query($query) {
+
+        global $wpdb;
+        
+        // Jika ada filter 'length'
+        if (0 < self::$filter['length']) :
+
+            $length = intval(self::$filter['length']);
+            $query .= " LIMIT {$length}";
+
+        endif;
+
+        // Jika ada filter 'start'
+        if (0 < self::$filter['start']) :
+
+            $start = intval(self::$filter['start']);
+            $query .= " OFFSET {$start}";
+
+        endif;
+
+        return $query;
+
+    }
+
+    /**
+     * Set filter data to query
+     */
+    static protected function set_filter_query($query) {
+
+        global $wpdb;
+
+        $where_exists = strpos($query, 'WHERE') !== false;
+
+        if (!is_null(self::$filter['search']) && is_array(self::$filter['search'])) :
+
+            foreach (self::$filter['search'] as $key => $value) :
+
+                if (!empty($value['val'])) :
+                    
+                    // Jika nilai filter adalah array
+                    if (is_array($value['val'])) :
+                        
+                        // Jika perbandingan adalah 'NOT IN'
+                        if (isset($value['compare']) && 'NOT IN' === $value['compare']) :
+                            $placeholders = implode(',', array_fill(0, count($value['val']), '%d'));
+                            $query .= ($where_exists ? ' AND' : ' WHERE') . " {$value['name']} NOT IN ($placeholders)";
+                            $query = $wpdb->prepare($query, ...$value['val']);
+                            $where_exists = true;
+                        else:
+                            // Jika tidak ada perbandingan, gunakan 'IN'
+                            $placeholders = implode(',', array_fill(0, count($value['val']), '%d'));
+                            $query .= ($where_exists ? ' AND' : ' WHERE') . " {$value['name']} IN ($placeholders)";
+                            $query = $wpdb->prepare($query, ...$value['val']);
+                            $where_exists = true;
+                        endif;
+
+                    elseif (isset($value['compare']) && !is_null($value['compare'])) :
+
+                        // Jika perbandingan adalah 'NOT IN'
+                        if ('NOT IN' === $value['compare']) :
+                            $placeholders = implode(',', array_fill(0, count($value['val']), '%d'));
+                            $query .= ($where_exists ? ' AND' : ' WHERE') . " {$value['name']} NOT IN ($placeholders)";
+                            $query = $wpdb->prepare($query, ...$value['val']);
+                            $where_exists = true;
+                        else:
+                            // Jika ada perbandingan, gunakan WHERE dengan komparator
+                            $query .= ($where_exists ? ' AND' : ' WHERE') . " {$value['name']} {$value['compare']} %s";
+                            $query = $wpdb->prepare($query, $value['val']);
+                            $where_exists = true;
+                        endif;
+
+                    else:
+
+                        // Jika hanya nilai biasa, gunakan WHERE sederhana
+                        $query .= ($where_exists ? ' AND' : ' WHERE') . " {$value['name']} = %s";
+                        $query = $wpdb->prepare($query, $value['val']);
+                        $where_exists = true;
+
+                    endif;
+
+                elseif (false === boolval($value['val'])) :
+
+                    // Jika nilai adalah false, tambahkan kondisi WHERE
+                    $query .= ($where_exists ? ' AND' : ' WHERE') . " {$value['name']} = %s";
+                    $query = $wpdb->prepare($query, $value['val']);
+                    $where_exists = true;
+
+                endif;
+
+            endforeach;
+
+        endif;
+
+        return $query;
+        
+    }
+
+    /**
      * Set table args
      * @since   1.0.0
      * @param   array $args
